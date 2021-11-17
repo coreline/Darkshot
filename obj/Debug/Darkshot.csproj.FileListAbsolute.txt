@@ -1,0 +1,25 @@
+C:\Users\A.Nosov\source\repos\Darkshot\bin\Debug\Darkshot.exe.config
+C:\Users\A.Nosov\source\repos\Darkshot\bin\Debug\Darkshot.exe
+C:\Users\A.Nosov\source\repos\Darkshot\bin\Debug\Darkshot.pdb
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.Properties.Resources.resources
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.csproj.GenerateResource.cache
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.exe
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.pdb
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.g.resources
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.CaptureForm.resources
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.AboutForm.resources
+C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.csprojAssemblyReference.cache
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.exe.config
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.exe
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.pdb
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.AssemblyReference.cache
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.SuggestedBindingRedirects.cache
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.g.resources
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.AboutForm.resources
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.Properties.Resources.resources
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.CaptureForm.resources
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.GenerateResource.cache
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.exe
+C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.pdb
