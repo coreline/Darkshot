@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -115,8 +116,9 @@ namespace Darkshot.PaintTools
             }
             if (string.IsNullOrWhiteSpace(_text))
                 return;
-            TextFormatFlags flags = TextFormatFlags.TextBoxControl | TextFormatFlags.NoPadding;
+            TextFormatFlags flags = TextFormatFlags.TextBoxControl | TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
             TextRenderer.DrawText(g, _text, _font, _rect, _color, flags);
+            //g.DrawString(_text, _font, Brushes.Red, _rect, StringFormat.GenericTypographic);
         }
 
         void onMouseDown(Control canvas, MouseEventArgs e)

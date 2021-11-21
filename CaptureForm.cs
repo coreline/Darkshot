@@ -6,8 +6,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Windows.Forms;
+using Darkshot.Gdi32;
+using System.Threading;
 
 namespace Darkshot
 {
@@ -70,7 +73,7 @@ namespace Darkshot
             var rect = SystemInformation.VirtualScreen;
             _area = new PaintToolWorkarea();
 
-            _bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppRgb);
+            _bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
             using (var g = Graphics.FromImage(_bitmap))
                 g.CopyFromScreen(rect.X, rect.Y, 0, 0, rect.Size, CopyPixelOperation.SourceCopy);
         }
@@ -137,26 +140,27 @@ namespace Darkshot
                 roi.Height = _bitmap.Height - roi.Y;
             }
 
-            using (var raw = _bitmap.Clone() as Bitmap)
-            {
-                using (var g = Graphics.FromImage(raw))
-                {
-                    var bounds = new Rectangle(Point.Empty, raw.Size);
-                    foreach (var item in _actionsTodo)
-                        item.RaisePaint(this, new PaintEventArgs(g, bounds));
+            Image image;
 
-                }
-                using (var bitmap = new Bitmap(roi.Width, roi.Height))
-                using (var g = Graphics.FromImage(bitmap))
+            using (var form = new Form())
+            {
+                form.Opacity = 0;
+                form.Location = new Point(-Location.X, -Location.Y);
+                form.Size = Size;
+                form.Visible = true;
+
+                using (var g = form.CreateGraphics())
+                    OnPaint(form, new PaintEventArgs(g, roi));
+                using (var bitmap = form.CaptureControl(roi))
+                using (var stream = new MemoryStream())
                 {
-                    g.DrawImage(raw, 0, 0, roi, GraphicsUnit.Pixel);
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        bitmap.Save(stream, format);
-                        return Image.FromStream(stream);
-                    }
+                    bitmap.Save(stream, format);
+                    image = Image.FromStream(stream);
                 }
             }
+
+            GC.Collect();
+            return image;
         }
 
         public void Undo()
@@ -212,7 +216,8 @@ namespace Darkshot
             foreach (var item in _actionsTodo)
                 item.RaisePaint(this, e);
             _tool?.RaisePaint(this, e);
-            _area.RaisePaint(this, e);
+            if (sender == this)
+                _area.RaisePaint(this, e);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)

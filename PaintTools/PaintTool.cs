@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
@@ -66,6 +67,10 @@ namespace Darkshot.PaintTools
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.CompositingQuality = CompositingQuality.HighQuality;
+            e.Graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            //e.Graphics.TextContrast = 0;
+
             Paint.Invoke(sender, e);
         }
 
