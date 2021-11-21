@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
 {
-    class PaintToolArrow : IPaintTool
+    class PaintToolArrow : PaintTool
     {
         const int PEN_WIDTH = 3;
         Point _pointStart;
@@ -15,6 +15,11 @@ namespace Darkshot.PaintTools
 
         public PaintToolArrow(Color color)
         {
+            Paint += (s, e) => { onPaint(e.Graphics); };
+            MouseDown += (s, e) => { onMouseDown(e); };
+            MouseUp += (s, e) => { onMouseUp(e); };
+            MouseMove += (s, e) => { onMouseMove(e); };
+
             var w = 3F;
             var h = w * 3F;
             var cap = new GraphicsPath();
@@ -26,37 +31,37 @@ namespace Darkshot.PaintTools
             _drawing = false;
         }
 
-        void IPaintTool.Paint(Graphics g)
+        void onPaint(Graphics g)
         {
             if (_pointStart == Point.Empty && _pointEnd == Point.Empty)
                 return;
             g.DrawLine(_pen, _pointStart, _pointEnd);
         }
 
-        bool IPaintTool.ProcessMouseDown(MouseEventArgs e)
+        void onMouseDown(MouseEventArgs e)
         {
             _drawing = true;
             _pointStart = e.Location;
             _pointEnd = e.Location;
-            return true;
         }
 
-        bool IPaintTool.ProcessMouseMove(MouseEventArgs e)
+        void onMouseMove(MouseEventArgs e)
         {
             if (!_drawing)
-                return false;
+                return;
             _pointEnd = e.Location;
-            return true;
         }
 
-        bool IPaintTool.ProcessMouseUp(MouseEventArgs e)
+        void onMouseUp(MouseEventArgs e)
         {
+            if (!_drawing)
+                return;
             _pointEnd = e.Location;
             _drawing = false;
-            return true;
+            RaiseComplete();
         }
 
-        Rectangle IPaintTool.GetBounds()
+        public override Rectangle GetBounds()
         {
             const int radius = 40;
             var rect = new Rectangle();
@@ -65,16 +70,6 @@ namespace Darkshot.PaintTools
             rect.Width = Math.Abs(_pointStart.X - _pointEnd.X) + 2 * radius;
             rect.Height = Math.Abs(_pointStart.Y - _pointEnd.Y) + 2 * radius;
             return rect;
-        }
-
-        Cursor IPaintTool.GetCursor()
-        {
-            return Cursors.Default;
-        }
-
-        bool IPaintTool.ProcessKeyDown(KeyEventArgs e)
-        {
-            return false;
         }
     }
 }

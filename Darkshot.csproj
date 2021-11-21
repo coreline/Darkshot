@@ -80,8 +80,7 @@
       <DependentUpon>CaptureForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalKeyboardHook.cs" />
-    <Compile Include="PaintTools\IPaintTool.cs" />
-    <Compile Include="PaintTools\PaintToolFactory.cs" />
+    <Compile Include="PaintTools\PaintTool.cs" />
     <Compile Include="PaintTools\PaintToolFilledRectangle.cs" />
     <Compile Include="PaintTools\PaintToolArrow.cs" />
     <Compile Include="PaintTools\PaintToolText.cs" />

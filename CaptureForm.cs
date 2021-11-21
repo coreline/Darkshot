@@ -18,17 +18,23 @@ namespace Darkshot
         Color _mark = Color.Yellow;
         PaintToolWorkarea _area;
         PaintToolType _toolType;
-        Rectangle _activeRegion;
-        IPaintTool _tool;
-        List<IPaintTool> _actionsTodo = new List<IPaintTool>();
-        List<IPaintTool> _actionsUndo = new List<IPaintTool>();
+        PaintTool _tool;
+        List<PaintTool> _actionsTodo = new List<PaintTool>();
+        List<PaintTool> _actionsUndo = new List<PaintTool>();
 
-        public bool IsTextTool { get { return _toolType == PaintToolType.Text; } }
-        public bool IsMarkerTool { get { return _toolType == PaintToolType.Marker; } }
         public Color CurrentColor
         {
-            get { return IsMarkerTool ? _mark : _color; }
-            set { if (IsMarkerTool) _mark = value; else _color = value; }
+            get
+            {
+                return _toolType == PaintToolType.Marker ? _mark : _color;
+            }
+            set
+            {
+                if (_toolType == PaintToolType.Marker)
+                    _mark = value;
+                else
+                    _color = value;
+            }
         }
 
         public CaptureForm()
@@ -48,7 +54,9 @@ namespace Darkshot
             Invalidate();
 
             toolsPaint.Visible = false;
+            toolsPaint.Cursor = Cursors.Default;
             toolsApp.Visible = false;
+            toolsApp.Cursor = Cursors.Default;
 
             toolExit.Click += (s, e) => Close();
             toolCopy.Click += (s, e) => CopyToClipboard();
@@ -60,7 +68,6 @@ namespace Darkshot
         void InitializeCaptureBitmap()
         {
             var rect = SystemInformation.VirtualScreen;
-            _activeRegion = rect;
             _area = new PaintToolWorkarea();
 
             _bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppRgb);
@@ -68,9 +75,14 @@ namespace Darkshot
                 g.CopyFromScreen(rect.X, rect.Y, 0, 0, rect.Size, CopyPixelOperation.SourceCopy);
         }
 
+        public bool IsPainting()
+        {
+            return GetPaintTool() != null && _toolType != PaintToolType.None;
+        }
+
         public void CopyToClipboard()
         {
-            PushPaintAction();
+            GetPaintTool()?.RaiseComplete();
             if (_area.IsEmpty)
                 return;
             using (var image = BuildImage(ImageFormat.Png))
@@ -80,7 +92,7 @@ namespace Darkshot
 
         public void SaveAs()
         {
-            PushPaintAction();
+            GetPaintTool()?.RaiseComplete();
             if (_area.IsEmpty)
                 return;
             if (saveFileDialog.Tag?.ToString() == true.ToString())
@@ -129,11 +141,10 @@ namespace Darkshot
             {
                 using (var g = Graphics.FromImage(raw))
                 {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
+                    var bounds = new Rectangle(Point.Empty, raw.Size);
                     foreach (var item in _actionsTodo)
-                        item.Paint(g);
+                        item.RaisePaint(this, new PaintEventArgs(g, bounds));
+
                 }
                 using (var bitmap = new Bitmap(roi.Width, roi.Height))
                 using (var g = Graphics.FromImage(bitmap))
@@ -148,10 +159,10 @@ namespace Darkshot
             }
         }
 
-        public bool Undo()
+        public void Undo()
         {
             if (_actionsTodo.Count == 0 && _tool == null)
-                return false;
+                return;
             if (_tool != null)
             {
                 _actionsUndo.Add(_tool);
@@ -163,83 +174,50 @@ namespace Darkshot
                 _actionsUndo.Add(_actionsTodo[i]);
                 _actionsTodo.RemoveAt(i);
             }
-            Render();
-            return true;
+            Invalidate();
         }
 
-        public bool Redo()
+        public void Redo()
         {
             if (_actionsUndo.Count == 0)
-                return false;
+                return;
             var i = _actionsUndo.Count - 1;
             _actionsTodo.Add(_actionsUndo[i]);
             _actionsUndo.RemoveAt(i);
-            Render();
-            return true;
+            Invalidate();
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
-            if (IsTextTool)
-                PushPaintAction();
-            else
-                HideTools();
-            if (GetPaintTool(true)?.ProcessMouseDown(e) == true)
-                Render();
+            HideTools();
+            GetPaintTool(true)?.RaiseMouseDown(this, e);
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
+            GetPaintTool()?.RaiseMouseMove(this, e);
             DisplayTools(e);
-            var tool = GetPaintTool(false);
-            if (tool?.ProcessMouseMove(e) == true)
-                Render();
-            this.Cursor = tool?.GetCursor() ?? Cursors.Default;
         }
 
         private void OnMouseUp(object sender, MouseEventArgs e)
         {
+            GetPaintTool()?.RaiseMouseUp(this, e);
             DisplayTools(e);
-            if (GetPaintTool(false)?.ProcessMouseUp(e) == true)
-                Render();
-            if (!IsTextTool)
-                PushPaintAction();
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
         {
-            var roi = _area.Roi;
-            var size = _bitmap.Size;
-            var darkRegions = new Rectangle[]
-            {
-                new Rectangle(0, 0, size.Width, roi.Y),
-                new Rectangle(0, roi.Y, roi.X, roi.Height),
-                new Rectangle(roi.X + roi.Width, roi.Y, size.Width - roi.X + roi.Width, roi.Height),
-                new Rectangle(0, roi.Y + roi.Height, size.Width, size.Height - roi.Y - roi.Height)
-            };
             e.Graphics.Clear(Color.Black);
             e.Graphics.DrawImageUnscaled(_bitmap, Point.Empty);
-            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.CompositingQuality = CompositingQuality.HighQuality;
             foreach (var item in _actionsTodo)
-                item.Paint(e.Graphics);
-            _tool?.Paint(e.Graphics);
-            e.Graphics.SmoothingMode = SmoothingMode.Default;
-            e.Graphics.InterpolationMode = InterpolationMode.Default;
-            e.Graphics.CompositingQuality = CompositingQuality.Default;
-            using (var brush = new SolidBrush(Color.FromArgb(127, Color.Black)))
-                e.Graphics.FillRectangles(brush, darkRegions);
-            _area.Paint(e.Graphics);
+                item.RaisePaint(this, e);
+            _tool?.RaisePaint(this, e);
+            _area.RaisePaint(this, e);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (_area.IsEmpty)
-                return;
-
-            if (GetPaintTool(false)?.ProcessKeyDown(e) == true)
-                Render();
+            GetPaintTool()?.RaiseKeyDown(this, e);
         }
 
         private void OnToolColorClick(object sender, EventArgs e)
@@ -252,7 +230,7 @@ namespace Darkshot
 
         private void OnToolPaintClick(object sender, EventArgs e)
         {
-            PushPaintAction();
+            GetPaintTool()?.RaiseComplete();
             if (string.IsNullOrEmpty(((ToolStripItem)sender).Tag?.ToString()))
                 return;
             foreach (var item in toolsPaint.Items)
@@ -266,27 +244,8 @@ namespace Darkshot
             var func = sender as ToolStripButton;
             func.Checked = !func.Checked;
             _toolType = func.Checked ? (PaintToolType)func.Tag : PaintToolType.None;
+            Cursor = PaintTool.GetDefaultCursor(_toolType);
             RefreshColorIcon();
-        }
-
-        private void Render()
-        {
-            IPaintTool tool;
-            tool = GetPaintTool(false);
-            if (tool == null || IsTextTool)
-            {
-                Invalidate();
-                _activeRegion = SystemInformation.VirtualScreen;
-                return;
-            }
-            var bounds = tool.GetBounds();
-            var x = Math.Min(bounds.X, _activeRegion.X);
-            var y = Math.Min(bounds.Y, _activeRegion.Y);
-            var w = Math.Max(bounds.X + bounds.Width, _activeRegion.X + _activeRegion.Width) - x;
-            var h = Math.Max(bounds.Y + bounds.Height, _activeRegion.Y + _activeRegion.Height) - y;
-            var rect = new Rectangle(x, y, w, h);
-            Invalidate(rect);
-            _activeRegion = bounds;
         }
 
         private void RefreshColorIcon()
@@ -304,7 +263,7 @@ namespace Darkshot
             if (_area.IsEmpty)
             {
                 toolTipSelRegion.ShowAlways = true;
-                toolTipSelRegion.Show("Выберите область", this, e.X, e.Y + 40);
+                toolTipSelRegion.Show("Выберите область", this, e.X + 10, e.Y + 10);
                 toolsPaint.Visible = false;
                 toolsApp.Visible = false;
                 return;
@@ -354,22 +313,22 @@ namespace Darkshot
                 toolsApp.Visible = false;
         }
 
-        private IPaintTool GetPaintTool(bool createIfNeed)
+        private PaintTool GetPaintTool(bool createIfNeed = false)
         {
             if (_toolType == PaintToolType.None)
                 return _area;
             if (_tool == null && createIfNeed)
-                _tool = PaintToolFactory.Create(_toolType, _color, _mark);
+            {
+                _tool = PaintTool.Create(_toolType, _color, _mark);
+                _tool.Complete += (s, e) =>
+                {
+                    _actionsTodo.Add(_tool);
+                    _actionsUndo.Clear();
+                    _tool = null;
+                    Cursor = PaintTool.GetDefaultCursor(_toolType);
+                };
+            }
             return _tool;
-        }
-
-        private void PushPaintAction()
-        {
-            if (_tool == null)
-                return;
-            _actionsTodo.Add(_tool);
-            _tool = null;
-            _actionsUndo.Clear();
         }
     }
 }

@@ -69,21 +69,25 @@ namespace Darkshot
         {
             if (_keyboardTimer.ElapsedMilliseconds < 70)
                 return;
-            var processed = false;
+
             if (_isCaptured)
             {
+                if (_captureForm?.IsPainting() == true && !Keyboard.IsKeyDown(Key.Escape))
+                    return;
                 if (Keyboard.IsKeyDown(Key.Escape))
-                    CloseCaptuteForm();
+                    _captureForm?.Close();
                 else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.C))
-                    processed = CopyScreenshotToClipboard();
+                    _captureForm?.CopyToClipboard();
                 else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.S))
-                    processed = SaveScreenshotToFile();
+                    _captureForm?.SaveAs();
                 else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.Z))
-                    processed = _captureForm?.Undo() ?? false;
+                    _captureForm?.Undo();
                 else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.Y))
-                    processed = _captureForm?.Redo() ?? false;
-                if (processed)
-                    _keyboardTimer.Restart();
+                    _captureForm?.Redo();
+                else
+                    return;
+                GC.Collect();
+                _keyboardTimer.Restart();
             }
             else
             {
@@ -94,28 +98,5 @@ namespace Darkshot
             }
         }
 
-        private void CloseCaptuteForm()
-        {
-            _captureForm?.Close();
-            GC.Collect();
-        }
-
-        private bool CopyScreenshotToClipboard()
-        {
-            if (_captureForm == null)
-                return false;
-
-            _captureForm.CopyToClipboard();
-            return true;
-        }
-
-        private bool SaveScreenshotToFile()
-        {
-            if (_captureForm == null)
-                return false;
-
-            _captureForm.SaveAs();
-            return true;
-        }
     }
 }

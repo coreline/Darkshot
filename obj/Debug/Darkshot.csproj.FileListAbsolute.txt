@@ -13,7 +13,6 @@ C:\Users\A.Nosov\source\repos\Darkshot\obj\Debug\Darkshot.csprojAssemblyReferenc
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.exe.config
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.exe
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\bin\Debug\Darkshot.pdb
-C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.AssemblyReference.cache
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.SuggestedBindingRedirects.cache
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.g.resources
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.AboutForm.resources

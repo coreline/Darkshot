@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
 {
-    class PaintToolWorkarea : IPaintTool
+    class PaintToolWorkarea : PaintTool
     {
         enum RoiModeType
         {
@@ -23,6 +23,11 @@ namespace Darkshot.PaintTools
 
         public PaintToolWorkarea()
         {
+            Paint += (s, e) => { onPaint(s as Control, e.Graphics); };
+            MouseDown += (s, e) => { onMouseDown(s as Control, e); };
+            MouseUp += (s, e) => { onMouseUp(s as Control, e); };
+            MouseMove += (s, e) => { onMouseMove(s as Control, e); };
+
             this.IsEmpty = true;
             this.IsCreating = false;
             this._cursor = Cursors.Default;
@@ -43,12 +48,18 @@ namespace Darkshot.PaintTools
             get; private set;
         }
 
-        public Cursor GetCursor()
+        public override Rectangle GetBounds()
         {
-            return _cursor;
+            const int radius = 40;
+            var rect = Roi;
+            rect.X -= radius;
+            rect.Y -= radius;
+            rect.Width += 2 * radius;
+            rect.Height += 2 * radius;
+            return rect;
         }
 
-        public bool ProcessMouseDown(MouseEventArgs e)
+        void onMouseDown(Control canvas, MouseEventArgs e)
         {
             if (IsEmpty)
             {
@@ -56,46 +67,55 @@ namespace Darkshot.PaintTools
                 IsCreating = true;
                 RoiMode = RoiModeType.Corner;
                 RefreshRoi(e.Location);
-                return true;
             }
             else if (RoiMode != RoiModeType.None)
             {
                 IsCreating = true;
                 StartResizeRoi(e.Location);
                 RefreshRoi(e.Location);
-                return true;
             }
-            return false;
+            canvas.Cursor = _cursor;
         }
 
-        public bool ProcessMouseMove(MouseEventArgs e)
+        void onMouseMove(Control canvas, MouseEventArgs e)
         {
             if (IsCreating)
-            {
                 RefreshRoi(e.Location);
-                return true;
-            }
             else
-            {
                 RefreshPossibleRoiMode(e.Location);
-            }
-            return false;
+            canvas.Cursor = _cursor;
         }
 
-        public bool ProcessMouseUp(MouseEventArgs e)
+        void onMouseUp(Control canvas, MouseEventArgs e)
         {
-            if (IsCreating)
+            if (!IsCreating)
+                return;
+
+            RefreshRoi(e.Location);
+            IsCreating = false;
+            RoiMode = RoiModeType.None;
+            canvas.Cursor = _cursor;
+            RaiseComplete();
+        }
+
+        void onPaint(Control canvas, Graphics g)
+        {
+            var roi = this.Roi;
+            var size = canvas.Size;
+            var darkRegions = new Rectangle[]
             {
-                RefreshRoi(e.Location);
-                IsCreating = false;
-                RoiMode = RoiModeType.None;
-                return true;
-            }
-            return false;
-        }
+                new Rectangle(0, 0, size.Width, roi.Y),
+                new Rectangle(0, roi.Y, roi.X, roi.Height),
+                new Rectangle(roi.X + roi.Width, roi.Y, size.Width - roi.X + roi.Width, roi.Height),
+                new Rectangle(0, roi.Y + roi.Height, size.Width, size.Height - roi.Y - roi.Height)
+            };
+            g.SmoothingMode = SmoothingMode.Default;
+            g.InterpolationMode = InterpolationMode.Default;
+            g.CompositingQuality = CompositingQuality.Default;
 
-        public void Paint(Graphics g)
-        {
+            using (var brush = new SolidBrush(Color.FromArgb(127, Color.Black)))
+                g.FillRectangles(brush, darkRegions);
+
             using (var pen = new Pen(Color.Gray))
             {
                 pen.Width = 1;
@@ -107,12 +127,8 @@ namespace Darkshot.PaintTools
             g.FillRectangles(Brushes.White, _resizeRectangles);
             g.DrawRectangles(Pens.Black, _resizeRectangles);
         }
-        public bool ProcessKeyDown(KeyEventArgs e)
-        {
-            return false;
-        }
 
-        private void RefreshPossibleRoiMode(Point p)
+        void RefreshPossibleRoiMode(Point p)
         {
             if (IsPointInRectangle(_resizeRectangles[0], p) || IsPointInRectangle(_resizeRectangles[7], p))
             {
@@ -142,11 +158,11 @@ namespace Darkshot.PaintTools
             else
             {
                 RoiMode = RoiModeType.None;
-                this._cursor = Cursors.Default;
+                this._cursor = IsEmpty ? Cursors.Cross : Cursors.Default;
             }
         }
 
-        private void StartResizeRoi(Point p)
+        void StartResizeRoi(Point p)
         {
             switch (RoiMode)
             {
@@ -180,7 +196,7 @@ namespace Darkshot.PaintTools
             RefreshRoi(p);
         }
 
-        private void RefreshRoi(Point pos)
+        void RefreshRoi(Point pos)
         {
             if (_startPoint.IsEmpty)
                 _startPoint = pos;
@@ -233,21 +249,10 @@ namespace Darkshot.PaintTools
             }
         }
 
-        private bool IsPointInRectangle(Rectangle rect, Point point)
+        bool IsPointInRectangle(Rectangle rect, Point point)
         {
             return point.X >= rect.X && point.X <= rect.X + rect.Width
                 && point.Y >= rect.Y && point.Y <= rect.Y + rect.Height;
-        }
-
-        Rectangle IPaintTool.GetBounds()
-        {
-            const int radius = 40;
-            var rect = Roi;
-            rect.X -= radius;
-            rect.Y -= radius;
-            rect.Width += 2 * radius;
-            rect.Height += 2 * radius;
-            return rect;
         }
     }
 }

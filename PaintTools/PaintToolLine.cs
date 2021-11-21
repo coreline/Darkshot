@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
 {
-    class PaintToolLine : IPaintTool
+    class PaintToolLine : PaintTool
     {
         const int PEN_WIDTH = 3;
         Point _pointStart;
@@ -14,13 +14,48 @@ namespace Darkshot.PaintTools
 
         public PaintToolLine(Color color)
         {
+            Paint += (s, e) => { onPaint(e.Graphics); };
+            MouseDown += (s, e) => { onMouseDown(e); };
+            MouseUp += (s, e) => { onMouseUp(e); };
+            MouseMove += (s, e) => { onMouseMove(e); };
+
             _pen = new Pen(color, PEN_WIDTH);
             _pointStart = Point.Empty;
             _pointEnd = Point.Empty;
             _drawing = false;
         }
 
-        Rectangle IPaintTool.GetBounds()
+        void onPaint(Graphics g)
+        {
+            if (_pointStart == Point.Empty && _pointEnd == Point.Empty)
+                return;
+            g.DrawLine(_pen, _pointStart, _pointEnd);
+        }
+
+        void onMouseDown(MouseEventArgs e)
+        {
+            _drawing = true;
+            _pointStart = e.Location;
+            _pointEnd = e.Location;
+        }
+
+        void  onMouseMove(MouseEventArgs e)
+        {
+            if (!_drawing)
+                return;
+            _pointEnd = e.Location;
+        }
+
+        void onMouseUp(MouseEventArgs e)
+        {
+            if (!_drawing)
+                return;
+            _pointEnd = e.Location;
+            _drawing = false;
+            RaiseComplete();
+        }
+
+        public override Rectangle GetBounds()
         {
             const int radius = 20;
             var rect = new Rectangle();
@@ -29,46 +64,6 @@ namespace Darkshot.PaintTools
             rect.Width = Math.Abs(_pointStart.X - _pointEnd.X) + 2 * radius;
             rect.Height = Math.Abs(_pointStart.Y - _pointEnd.Y) + 2 * radius;
             return rect;
-        }
-
-        Cursor IPaintTool.GetCursor()
-        {
-            return Cursors.Default;
-        }
-
-        bool IPaintTool.ProcessKeyDown(KeyEventArgs e)
-        {
-            return false;
-        }
-
-        void IPaintTool.Paint(Graphics g)
-        {
-            if (_pointStart == Point.Empty && _pointEnd == Point.Empty)
-                return;
-            g.DrawLine(_pen, _pointStart, _pointEnd);
-        }
-
-        bool IPaintTool.ProcessMouseDown(MouseEventArgs e)
-        {
-            _drawing = true;
-            _pointStart = e.Location;
-            _pointEnd = e.Location;
-            return true;
-        }
-
-        bool IPaintTool.ProcessMouseMove(MouseEventArgs e)
-        {
-            if (!_drawing)
-                return false;
-            _pointEnd = e.Location;
-            return true;
-        }
-
-        bool IPaintTool.ProcessMouseUp(MouseEventArgs e)
-        {
-            _pointEnd = e.Location;
-            _drawing = false;
-            return true;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
 {
-    class PaintToolMarker : IPaintTool
+    class PaintToolMarker : PaintTool
     {
         const int PEN_WIDTH = 24;
         List<Point> _points;
@@ -15,6 +15,11 @@ namespace Darkshot.PaintTools
 
         public PaintToolMarker(Color color)
         {
+            Paint += (s, e) => { onPaint(e.Graphics); };
+            MouseDown += (s, e) => { onMouseDown(e); };
+            MouseUp += (s, e) => { onMouseUp(e); };
+            MouseMove += (s, e) => { onMouseMove(e); };
+
             _pen = new Pen(Color.FromArgb(127, color), PEN_WIDTH);
             _pen.StartCap = LineCap.Round;
             _pen.EndCap = LineCap.Round;
@@ -23,7 +28,7 @@ namespace Darkshot.PaintTools
             _drawing = false;
         }
 
-        void IPaintTool.Paint(Graphics g)
+        void onPaint(Graphics g)
         {
             if (_points.Count < 1)
                 return;
@@ -37,28 +42,28 @@ namespace Darkshot.PaintTools
             g.DrawLines(_pen, points);
         }
 
-        bool IPaintTool.ProcessMouseDown(MouseEventArgs e)
+        void onMouseDown(MouseEventArgs e)
         {
             _drawing = true;
             _points.Add(e.Location);
-            return true;
         }
 
-        bool IPaintTool.ProcessMouseMove(MouseEventArgs e)
+        void onMouseMove(MouseEventArgs e)
         {
             if (!_drawing)
-                return false;
+                return;
             _points.Add(e.Location);
-            return true;
         }
 
-        bool IPaintTool.ProcessMouseUp(MouseEventArgs e)
+        void onMouseUp(MouseEventArgs e)
         {
+            if (!_drawing)
+                return;
             _drawing = false;
-            return true;
+            RaiseComplete();
         }
 
-        Rectangle IPaintTool.GetBounds()
+        public override Rectangle GetBounds()
         {
             const int radius = 20;
             if (_points.Count == 0)
@@ -77,16 +82,6 @@ namespace Darkshot.PaintTools
             rect.Width += 2 * radius;
             rect.Height += 2 * radius;
             return rect;
-        }
-
-        Cursor IPaintTool.GetCursor()
-        {
-            return Cursors.Default;
-        }
-
-        bool IPaintTool.ProcessKeyDown(KeyEventArgs e)
-        {
-            return false;
         }
     }
 }

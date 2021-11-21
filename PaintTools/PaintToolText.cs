@@ -1,123 +1,251 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Darkshot.PaintTools
 {
-    class PaintToolText : IPaintTool
+    class PaintToolText : PaintTool
     {
-        Point _pointStart;
-        Brush _brush;
+        class CanvasTextBox : TextBox
+        {
+            public CanvasTextBox()
+            {
+                BorderStyle = BorderStyle.None;
+                Font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Regular, GraphicsUnit.Pixel);
+                Location = Point.Empty;
+                Margin = new Padding(0);
+                Multiline = true;
+                Size = Size.Empty;
+                WordWrap = false;
+                ShortcutsEnabled = true;
+            }
+            protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+            {
+                if (keyData == (Keys.Back | Keys.Control))
+                {
+                    for (int i = this.SelectionStart - 1; i > 0; i--)
+                    {
+                        switch (Text.Substring(i, 1))
+                        {    //set up any stopping points you want
+                            case " ":
+                            case ";":
+                            case ",":
+                            case "/":
+                            case "\\":
+                                Text = Text.Remove(i, SelectionStart - i);
+                                SelectionStart = i;
+                                return true;
+                            case "\n":
+                                Text = Text.Remove(i - 1, SelectionStart - i);
+                                SelectionStart = i;
+                                return true;
+                        }
+                    }
+                    Clear();        //in case you never hit a stopping point, the whole textbox goes blank
+                    return true;
+                }
+                else
+                {
+                    return base.ProcessCmdKey(ref msg, keyData);
+                }
+            }
+        }
+
+        const int PEN_WIDTH = 2;
+        Pen _penFirst;
+        Pen _penSecond;
+        Color _color;
+        bool _completed = false;
+        bool _initialized = false;
+        bool _resizing = false;
+        bool _moving = false;
+        Point _startPoint;
+        Point _movePoint;
+        Control _canvas;
+        string _text;
         Font _font;
-        StringBuilder _text;
-        bool _init;
-
-        enum MapType : uint
-        {
-            MAPVK_VK_TO_VSC = 0x0,
-            MAPVK_VSC_TO_VK = 0x1,
-            MAPVK_VK_TO_CHAR = 0x2,
-            MAPVK_VSC_TO_VK_EX = 0x3,
-        }
-        [DllImport("user32.dll")]
-        static extern bool GetKeyboardState(byte[] lpKeyState);
-        [DllImport("user32.dll")]
-        static extern uint MapVirtualKey(uint uCode, MapType uMapType);
-        [DllImport("user32.dll")]
-        static extern int ToUnicode(
-             uint wVirtKey,
-             uint wScanCode,
-             byte[] lpKeyState,
-             [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 4)]
-             StringBuilder pwszBuff,
-             int cchBuff,
-             uint wFlags);
-
-        static char GetCharFromKey(int virtualKey)
-        {
-            char ch = ' ';
-
-            byte[] keyboardState = new byte[256];
-            GetKeyboardState(keyboardState);
-
-            uint scanCode = MapVirtualKey((uint)virtualKey, MapType.MAPVK_VK_TO_VSC);
-            StringBuilder stringBuilder = new StringBuilder(2);
-
-            int result = ToUnicode((uint)virtualKey, scanCode, keyboardState, stringBuilder, stringBuilder.Capacity, 0);
-            if (result == 0 || result == -1)
-                return ch;
-            return stringBuilder[0];
-        }
+        Rectangle _rect;
+        Rectangle _boundsDash;
+        Rectangle _boundsMove;
+        CanvasTextBox _textBox;
+        Size _defaultSize;
+        Size _userSize;
 
         public PaintToolText(Color color)
         {
-            _brush = new SolidBrush(color);
-            _font = new Font(FontFamily.GenericSansSerif, 16, FontStyle.Regular, GraphicsUnit.Pixel);
-            _pointStart = Point.Empty;
-            _text = new StringBuilder();
-            _text.Append("|");
-        }
-        Cursor IPaintTool.GetCursor()
-        {
-            return Cursors.IBeam;
+            Paint += (s, e) => { onPaint(e.Graphics); };
+            MouseDown += (s, e) => { onMouseDown(s as Control, e); };
+            MouseMove += (s, e) => { onMouseMove(s as Control, e); };
+            MouseUp += (s, e) => { onMouseUp(s as Control, e); };
+            KeyDown += (s, e) => { onKeyDown(s as Control, e); };
+            Complete += (s, e) => { onComplete(); };
+
+            _color = color;
+            var dashWidth = 4f;
+            _penFirst = new Pen(Color.Black, PEN_WIDTH)
+            {
+                DashPattern = new float[] { dashWidth, dashWidth }
+            };
+            _penSecond = new Pen(Color.White, PEN_WIDTH)
+            {
+                DashOffset = dashWidth,
+                DashPattern = new float[] { dashWidth, dashWidth }
+            };
+            _textBox = new CanvasTextBox();
+            _textBox.TextChanged += (s, e) => { onTextChanged(s, e); };
+            _textBox.ForeColor = color;
+            _font = _textBox.Font;
+            _defaultSize = new Size(200, _font.Height * 3);
         }
 
-        bool IPaintTool.ProcessKeyDown(KeyEventArgs e)
+        void onKeyDown(Control canvas, KeyEventArgs e)
         {
-            if (!_init)
-            {
-                _text.Clear();
-                _init = true;
-            }
-            if (e.KeyCode == Keys.Enter)
-            {
-                _text.AppendLine();
-            }
-            else if (e.KeyCode == Keys.Back)
-            {
-                if (_text.Length > 0)
-                    _text.Remove(_text.Length - 1, 1);
-            }
-            else
-            {
-                var c = GetCharFromKey(e.KeyValue);
-                if (Char.IsControl(c))
-                    return false;
-                _text.Append(c);
-            }
-            return true;
         }
 
-        void IPaintTool.Paint(Graphics g)
+        void onPaint(Graphics g)
         {
-            if (_text.Length == 0)
+            if (_initialized && !_completed)
+            {
+                g.DrawRectangle(_penFirst, _boundsDash);
+                g.DrawRectangle(_penSecond, _boundsDash);
                 return;
-            g.DrawString(_text.ToString(), _font, _brush, _pointStart);
+            }
+            if (string.IsNullOrWhiteSpace(_text))
+                return;
+            TextFormatFlags flags = TextFormatFlags.TextBoxControl | TextFormatFlags.NoPadding;
+            TextRenderer.DrawText(g, _text, _font, _rect, _color, flags);
         }
 
-        bool IPaintTool.ProcessMouseDown(MouseEventArgs e)
+        void onMouseDown(Control canvas, MouseEventArgs e)
         {
-            _pointStart = e.Location;
-            _pointStart.X = _pointStart.X + Cursor.Current.Size.Width / 5;
-            _pointStart.Y = _pointStart.Y - Cursor.Current.Size.Height * 2 / 5;
-            return true;
+            if (!_initialized)
+            {
+                _canvas = canvas;
+                _initialized = true;
+                _resizing = true;
+                _startPoint = e.Location;
+                _textBox.Location = _startPoint;
+                _canvas.Controls.Add(_textBox);
+                _textBox.Focus();
+                return;
+            }
+            if (IsMovablePosition(e.Location)) 
+            {
+                _moving = true;
+                _movePoint = e.Location;
+                return;
+            }
+            RaiseComplete();
         }
 
-        bool IPaintTool.ProcessMouseMove(MouseEventArgs e)
+        void onMouseMove(Control canvas, MouseEventArgs e)
         {
-            return false;
+            var point = e.Location;
+            if (!_initialized)
+            {
+                canvas.Cursor = Cursors.IBeam;
+                return;
+            }
+            if (_resizing)
+            {
+                _textBox.Location = new Point(Math.Min(_startPoint.X, point.X), Math.Min(_startPoint.Y, point.Y));
+                _textBox.Size = new Size(Math.Abs(_startPoint.X - point.X), Math.Abs(_startPoint.Y - point.Y));
+                RecalcBounds();
+                return;
+            }
+            if (_moving)
+            {
+                var x = _startPoint.X + point.X - _movePoint.X;
+                var y = _startPoint.Y + point.Y - _movePoint.Y;
+                _textBox.Location = new Point(x, y);
+                RecalcBounds();
+                return;
+            }
+
+            canvas.Cursor = IsMovablePosition(point) ? Cursors.SizeAll : Cursors.Default;
         }
 
-        bool IPaintTool.ProcessMouseUp(MouseEventArgs e)
+        void onMouseUp(Control canvas, MouseEventArgs e)
         {
-            return false;
+            if (_resizing)
+            {
+                _resizing = false;
+                _startPoint = _textBox.Location;
+                if (_textBox.Width < _defaultSize.Width)
+                    _textBox.Width = _defaultSize.Width;
+                if (_textBox.Height < _defaultSize.Height)
+                    _textBox.Height = _defaultSize.Height;
+                _userSize = _textBox.Size;
+                RecalcBounds();
+                return;
+            }
+            if (_moving)
+            {
+                _moving = false;
+                _startPoint = _textBox.Location;
+                RecalcBounds();
+                return;
+            }
+            if (_initialized)
+            {
+                RaiseComplete();
+                return;
+            }
+        }
+        void onTextChanged(object sender, EventArgs e)
+        {
+            var margin = 10;
+            Size size = TextRenderer.MeasureText(_textBox.Text, _textBox.Font);
+            size.Width = Math.Max(size.Width + margin, _userSize.Width);
+            size.Height = Math.Max(size.Height + margin, _userSize.Height);
+            if (_textBox.Size == size)
+                return;
+            _textBox.Size = size;
+            var roi = new Rectangle(Point.Empty, SystemInformation.VirtualScreen.Size);
+            Invalidate(_canvas, roi);
+            RecalcBounds();
         }
 
-        Rectangle IPaintTool.GetBounds()
+        void onComplete()
         {
-            return SystemInformation.VirtualScreen;
+            _completed = true;
+            _text = _textBox.Text;
+            _canvas?.Controls.Remove(_textBox);
+            _textBox.Dispose();
+        }
+
+        public override Rectangle GetBounds()
+        {
+            var bounds = _boundsDash.IsEmpty
+                ? new Rectangle(_textBox.Location, _textBox.Size)
+                : _boundsDash;
+            bounds.Inflate(10 + 2 * PEN_WIDTH, 10 + 2 * PEN_WIDTH);
+            return bounds;
+        }
+
+        void RecalcBounds()
+        {
+            _rect = new Rectangle(_textBox.Location, _textBox.Size);
+            _boundsDash = new Rectangle(_rect.X - PEN_WIDTH,
+                                     _rect.Y - PEN_WIDTH,
+                                     _rect.Width + 2 * PEN_WIDTH - 1,
+                                     _rect.Height + 2 * PEN_WIDTH - 1);
+            _boundsMove = _boundsDash;
+            _boundsMove.Inflate(10, 10);
+        }
+
+        bool IsPointInRect(Rectangle rect, Point point)
+        {
+            return point.X >= rect.X && point.X <= rect.X + rect.Width
+                && point.Y >= rect.Y && point.Y <= rect.Y + rect.Height;
+        }
+
+        bool IsMovablePosition(Point point)
+        {
+            return IsPointInRect(_boundsMove, point) && !IsPointInRect(_rect, point);
         }
     }
 }
