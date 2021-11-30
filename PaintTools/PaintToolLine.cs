@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Keyboard = System.Windows.Input.Keyboard;
+using Key = System.Windows.Input.Key;
 
 namespace Darkshot.PaintTools
 {
@@ -39,11 +41,28 @@ namespace Darkshot.PaintTools
             _pointEnd = e.Location;
         }
 
-        void  onMouseMove(MouseEventArgs e)
+        void onMouseMove(MouseEventArgs e)
         {
             if (!_drawing)
                 return;
             _pointEnd = e.Location;
+
+            if (!Keyboard.IsKeyDown(Key.LeftShift))
+                return;
+
+            var dx = Math.Abs(_pointEnd.X - _pointStart.X);
+            var dy = Math.Abs(_pointEnd.Y - _pointStart.Y);
+            var posX = _pointStart.X + Math.Sign(_pointEnd.X - _pointStart.X) * Math.Max(dx, dy);
+            var posY = _pointStart.Y + Math.Sign(_pointEnd.Y - _pointStart.Y) * Math.Max(dx, dy);
+            var lenZ = (int)Math.Sqrt(Math.Pow(posX - _pointStart.X, 2) + Math.Pow(posY - _pointStart.Y, 2));
+            var dz = (int)Math.Abs(lenZ - Math.Sqrt(dx * dx + dy * dy));
+            var min = Math.Min(Math.Min(dx, dy), dz);
+            if (min == dx)
+                _pointEnd.X = _pointStart.X;
+            else if (min == dy)
+                _pointEnd.Y = _pointStart.Y;
+            else
+                _pointEnd = new Point(posX, posY);
         }
 
         void onMouseUp(MouseEventArgs e)

@@ -268,7 +268,7 @@ namespace Darkshot
             if (_area.IsEmpty)
             {
                 toolTipSelRegion.ShowAlways = true;
-                toolTipSelRegion.Show("Выберите область", this, e.X + 10, e.Y + 10);
+                toolTipSelRegion.Show("Выберите область", this, e.X + 15, e.Y + 30);
                 toolsPaint.Visible = false;
                 toolsApp.Visible = false;
                 return;

@@ -37,13 +37,6 @@ namespace Darkshot
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CaptureForm));
             this.toolTipSelRegion = new System.Windows.Forms.ToolTip(this.components);
             this.toolsPaint = new System.Windows.Forms.ToolStrip();
-            this.toolPen = new System.Windows.Forms.ToolStripButton();
-            this.toolLine = new System.Windows.Forms.ToolStripButton();
-            this.toolArrow = new System.Windows.Forms.ToolStripButton();
-            this.toolRectangle = new System.Windows.Forms.ToolStripButton();
-            this.toolFill = new System.Windows.Forms.ToolStripButton();
-            this.toolText = new System.Windows.Forms.ToolStripButton();
-            this.toolMarker = new System.Windows.Forms.ToolStripButton();
             this.toolColor = new System.Windows.Forms.ToolStripButton();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolCopy = new System.Windows.Forms.ToolStripButton();
@@ -54,6 +47,13 @@ namespace Darkshot
             this.toolRedo = new System.Windows.Forms.ToolStripButton();
             this.toolSave = new System.Windows.Forms.ToolStripButton();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.toolPen = new System.Windows.Forms.ToolStripButton();
+            this.toolLine = new System.Windows.Forms.ToolStripButton();
+            this.toolArrow = new System.Windows.Forms.ToolStripButton();
+            this.toolRectangle = new System.Windows.Forms.ToolStripButton();
+            this.toolFill = new System.Windows.Forms.ToolStripButton();
+            this.toolText = new System.Windows.Forms.ToolStripButton();
+            this.toolMarker = new System.Windows.Forms.ToolStripButton();
             this.toolsPaint.SuspendLayout();
             this.toolsApp.SuspendLayout();
             this.SuspendLayout();
@@ -78,6 +78,90 @@ namespace Darkshot
             this.toolsPaint.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.toolsPaint.Size = new System.Drawing.Size(30, 223);
             this.toolsPaint.TabIndex = 0;
+            // 
+            // toolColor
+            // 
+            this.toolColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolColor.Image = ((System.Drawing.Image)(resources.GetObject("toolColor.Image")));
+            this.toolColor.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolColor.Name = "toolColor";
+            this.toolColor.Size = new System.Drawing.Size(29, 24);
+            this.toolColor.Text = "Цвет";
+            this.toolColor.Click += new System.EventHandler(this.OnToolColorClick);
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(14, 4);
+            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
+            // 
+            // toolCopy
+            // 
+            this.toolCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolCopy.Image = ((System.Drawing.Image)(resources.GetObject("toolCopy.Image")));
+            this.toolCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolCopy.Name = "toolCopy";
+            this.toolCopy.Size = new System.Drawing.Size(29, 24);
+            this.toolCopy.Text = "Копировать (Ctrl + C)";
+            // 
+            // toolExit
+            // 
+            this.toolExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolExit.Image = ((System.Drawing.Image)(resources.GetObject("toolExit.Image")));
+            this.toolExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolExit.Name = "toolExit";
+            this.toolExit.Size = new System.Drawing.Size(29, 24);
+            this.toolExit.Text = "Выход (Esc)";
+            // 
+            // toolsApp
+            // 
+            this.toolsApp.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolsApp.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolsApp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolUndo,
+            this.toolRedo,
+            this.toolCopy,
+            this.toolSave,
+            this.toolExit});
+            this.toolsApp.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
+            this.toolsApp.Location = new System.Drawing.Point(39, 9);
+            this.toolsApp.Name = "toolsApp";
+            this.toolsApp.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.toolsApp.Size = new System.Drawing.Size(185, 27);
+            this.toolsApp.TabIndex = 1;
+            // 
+            // toolUndo
+            // 
+            this.toolUndo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolUndo.Image = ((System.Drawing.Image)(resources.GetObject("toolUndo.Image")));
+            this.toolUndo.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolUndo.Name = "toolUndo";
+            this.toolUndo.Size = new System.Drawing.Size(29, 24);
+            this.toolUndo.Text = "Отменить (Ctrl + Z)";
+            // 
+            // toolRedo
+            // 
+            this.toolRedo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolRedo.Image = ((System.Drawing.Image)(resources.GetObject("toolRedo.Image")));
+            this.toolRedo.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolRedo.Name = "toolRedo";
+            this.toolRedo.Size = new System.Drawing.Size(29, 24);
+            this.toolRedo.Text = "Вернуть (Ctrl + Y)";
+            // 
+            // toolSave
+            // 
+            this.toolSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolSave.Image = ((System.Drawing.Image)(resources.GetObject("toolSave.Image")));
+            this.toolSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolSave.Name = "toolSave";
+            this.toolSave.Size = new System.Drawing.Size(29, 24);
+            this.toolSave.Text = "Сохранить (Ctrl + S)";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "Изображение в формате PNG (*.png)|*.png";
             // 
             // toolPen
             // 
@@ -155,90 +239,6 @@ namespace Darkshot
             this.toolMarker.Tag = Darkshot.PaintTools.PaintToolType.Marker;
             this.toolMarker.Text = "Маркер";
             this.toolMarker.Click += new System.EventHandler(this.OnToolPaintClick);
-            // 
-            // toolColor
-            // 
-            this.toolColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolColor.Image = ((System.Drawing.Image)(resources.GetObject("toolColor.Image")));
-            this.toolColor.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolColor.Name = "toolColor";
-            this.toolColor.Size = new System.Drawing.Size(29, 24);
-            this.toolColor.Text = "Цвет";
-            this.toolColor.Click += new System.EventHandler(this.OnToolColorClick);
-            // 
-            // toolStripDropDownButton1
-            // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(14, 4);
-            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
-            // 
-            // toolCopy
-            // 
-            this.toolCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolCopy.Image = ((System.Drawing.Image)(resources.GetObject("toolCopy.Image")));
-            this.toolCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolCopy.Name = "toolCopy";
-            this.toolCopy.Size = new System.Drawing.Size(29, 24);
-            this.toolCopy.Text = "Копировать (Ctrl + C)";
-            // 
-            // toolExit
-            // 
-            this.toolExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolExit.Image = ((System.Drawing.Image)(resources.GetObject("toolExit.Image")));
-            this.toolExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolExit.Name = "toolExit";
-            this.toolExit.Size = new System.Drawing.Size(29, 24);
-            this.toolExit.Text = "Отменить (Esc)";
-            // 
-            // toolsApp
-            // 
-            this.toolsApp.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolsApp.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolsApp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolUndo,
-            this.toolRedo,
-            this.toolCopy,
-            this.toolSave,
-            this.toolExit});
-            this.toolsApp.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-            this.toolsApp.Location = new System.Drawing.Point(39, 9);
-            this.toolsApp.Name = "toolsApp";
-            this.toolsApp.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolsApp.Size = new System.Drawing.Size(185, 27);
-            this.toolsApp.TabIndex = 1;
-            // 
-            // toolUndo
-            // 
-            this.toolUndo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolUndo.Image = ((System.Drawing.Image)(resources.GetObject("toolUndo.Image")));
-            this.toolUndo.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolUndo.Name = "toolUndo";
-            this.toolUndo.Size = new System.Drawing.Size(29, 24);
-            this.toolUndo.Text = "Отменить (Ctrl + Z)";
-            // 
-            // toolRedo
-            // 
-            this.toolRedo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolRedo.Image = ((System.Drawing.Image)(resources.GetObject("toolRedo.Image")));
-            this.toolRedo.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolRedo.Name = "toolRedo";
-            this.toolRedo.Size = new System.Drawing.Size(29, 24);
-            this.toolRedo.Text = "Вернуть (Ctrl + Y)";
-            // 
-            // toolSave
-            // 
-            this.toolSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolSave.Image = ((System.Drawing.Image)(resources.GetObject("toolSave.Image")));
-            this.toolSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolSave.Name = "toolSave";
-            this.toolSave.Size = new System.Drawing.Size(29, 24);
-            this.toolSave.Text = "Сохранить (Ctrl + S)";
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.Filter = "Изображение в формате PNG (*.png)|*.png";
             // 
             // CaptureForm
             // 

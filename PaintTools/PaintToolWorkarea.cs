@@ -50,12 +50,9 @@ namespace Darkshot.PaintTools
 
         public override Rectangle GetBounds()
         {
-            const int radius = 40;
+            const int radius = 100;
             var rect = Roi;
-            rect.X -= radius;
-            rect.Y -= radius;
-            rect.Width += 2 * radius;
-            rect.Height += 2 * radius;
+            rect.Inflate(radius, radius);
             return rect;
         }
 
@@ -104,9 +101,9 @@ namespace Darkshot.PaintTools
             var size = canvas.Size;
             var darkRegions = new Rectangle[]
             {
-                new Rectangle(0, 0, size.Width, roi.Y),
-                new Rectangle(0, roi.Y, roi.X, roi.Height),
-                new Rectangle(roi.X + roi.Width, roi.Y, size.Width - roi.X + roi.Width, roi.Height),
+                new Rectangle(0, 0, size.Width, roi.Y - 1),
+                new Rectangle(0, roi.Y - 1, roi.X - 1, roi.Height + 1),
+                new Rectangle(roi.X + roi.Width, roi.Y - 1, size.Width - roi.X + roi.Width, roi.Height + 1),
                 new Rectangle(0, roi.Y + roi.Height, size.Width, size.Height - roi.Y - roi.Height)
             };
             g.SmoothingMode = SmoothingMode.Default;
@@ -158,7 +155,7 @@ namespace Darkshot.PaintTools
             else
             {
                 RoiMode = RoiModeType.None;
-                this._cursor = IsEmpty ? Cursors.Cross : Cursors.Default;
+                this._cursor = Cursors.Default;
             }
         }
 
