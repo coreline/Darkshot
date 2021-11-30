@@ -45,7 +45,21 @@ namespace Darkshot.PaintTools
         {
             if (!_drawing)
                 return;
-            _pointEnd = e.Location;
+            setEndPoint(e.Location);
+        }
+
+        void onMouseUp(MouseEventArgs e)
+        {
+            if (!_drawing)
+                return;
+            _drawing = false;
+            setEndPoint(e.Location);
+            RaiseComplete();
+        }
+
+        void setEndPoint(Point point)
+        {
+            _pointEnd = point;
 
             if (!Keyboard.IsKeyDown(Key.LeftShift))
                 return;
@@ -63,15 +77,6 @@ namespace Darkshot.PaintTools
                 _pointEnd.Y = _pointStart.Y;
             else
                 _pointEnd = new Point(posX, posY);
-        }
-
-        void onMouseUp(MouseEventArgs e)
-        {
-            if (!_drawing)
-                return;
-            _pointEnd = e.Location;
-            _drawing = false;
-            RaiseComplete();
         }
 
         public override Rectangle GetBounds()

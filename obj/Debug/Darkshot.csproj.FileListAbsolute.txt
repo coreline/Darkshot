@@ -22,4 +22,3 @@ C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Dar
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.exe
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.pdb
-C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.AssemblyReference.cache
