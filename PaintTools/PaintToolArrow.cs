@@ -13,6 +13,7 @@ namespace Darkshot.PaintTools
         const float PEN_WIDTH = 3;
         Point _pointStart;
         Point _pointEnd;
+        Point _pointLast;
         Pen _pen;
         bool _drawing;
 
@@ -22,6 +23,8 @@ namespace Darkshot.PaintTools
             MouseDown += (s, e) => { onMouseDown(e); };
             MouseUp += (s, e) => { onMouseUp(e); };
             MouseMove += (s, e) => { onMouseMove(e); };
+            KeyDown += (s, e) => setLastPoint();
+            KeyUp += (s, e) => setLastPoint();
 
             _pointStart = Point.Empty;
             _pointEnd = Point.Empty;
@@ -74,8 +77,14 @@ namespace Darkshot.PaintTools
             RaiseComplete();
         }
 
+        void setLastPoint()
+        {
+            setEndPoint(_pointLast);
+        }
+
         void setEndPoint(Point point)
         {
+            _pointLast = point;
             _pointEnd = point;
 
             if (!Keyboard.IsKeyDown(Key.LeftShift))

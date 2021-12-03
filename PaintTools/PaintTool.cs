@@ -23,6 +23,7 @@ namespace Darkshot.PaintTools
         public event EventHandler Complete;
         protected event PaintEventHandler Paint;
         protected event KeyEventHandler KeyDown;
+        protected event KeyEventHandler KeyUp;
         protected event MouseEventHandler MouseDown;
         protected event MouseEventHandler MouseMove;
         protected event MouseEventHandler MouseUp;
@@ -80,6 +81,15 @@ namespace Darkshot.PaintTools
                 return;
             var bounds = GetBounds();
             KeyDown.Invoke(sender, e);
+            Invalidate(sender, bounds);
+        }
+
+        public void RaiseKeyUp(Control sender, KeyEventArgs e)
+        {
+            if (KeyUp == null)
+                return;
+            var bounds = GetBounds();
+            KeyUp.Invoke(sender, e);
             Invalidate(sender, bounds);
         }
 

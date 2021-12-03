@@ -209,6 +209,16 @@ namespace Darkshot
             DisplayTools(e);
         }
 
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            GetPaintTool()?.RaiseKeyDown(this, e);
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            GetPaintTool()?.RaiseKeyUp(this, e);
+        }
+
         private void OnPaint(object sender, PaintEventArgs e)
         {
             e.Graphics.Clear(Color.Black);
@@ -218,19 +228,6 @@ namespace Darkshot
             _tool?.RaisePaint(this, e);
             if (sender == this)
                 _area.RaisePaint(this, e);
-        }
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            GetPaintTool()?.RaiseKeyDown(this, e);
-        }
-
-        private void OnToolColorClick(object sender, EventArgs e)
-        {
-            colorDialog.Color = CurrentColor;
-            if (colorDialog.ShowDialog() == DialogResult.OK)
-                CurrentColor = colorDialog.Color;
-            RefreshColorIcon();
         }
 
         private void OnToolPaintClick(object sender, EventArgs e)
@@ -250,6 +247,21 @@ namespace Darkshot
             func.Checked = !func.Checked;
             _toolType = func.Checked ? (PaintToolType)func.Tag : PaintToolType.None;
             Cursor = PaintTool.GetDefaultCursor(_toolType);
+            RefreshColorIcon();
+        }
+
+        private void OnToolColorClick(object sender, EventArgs e)
+        {
+            var margin = 3;
+            var right = toolsPaint.Left - margin;
+            var bottom = toolsApp.Top - margin;
+
+            using (var dialog = new CustomColorDialog(right, bottom))
+            {
+                dialog.Color = CurrentColor;
+                if (dialog.ShowDialog() == DialogResult.OK)
+                    CurrentColor = dialog.Color;
+            }
             RefreshColorIcon();
         }
 

@@ -41,7 +41,6 @@ namespace Darkshot
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolCopy = new System.Windows.Forms.ToolStripButton();
             this.toolExit = new System.Windows.Forms.ToolStripButton();
-            this.colorDialog = new System.Windows.Forms.ColorDialog();
             this.toolsApp = new System.Windows.Forms.ToolStrip();
             this.toolUndo = new System.Windows.Forms.ToolStripButton();
             this.toolRedo = new System.Windows.Forms.ToolStripButton();
@@ -260,6 +259,7 @@ namespace Darkshot
             this.TopMost = true;
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnMouseUp);
@@ -285,7 +285,6 @@ namespace Darkshot
         private System.Windows.Forms.ToolStripButton toolExit;
         private System.Windows.Forms.ToolStripButton toolMarker;
         private System.Windows.Forms.ToolStripButton toolColor;
-        private System.Windows.Forms.ColorDialog colorDialog;
         private ToolStrip toolsApp;
         private ToolStripButton toolUndo;
         private ToolStripButton toolRedo;
