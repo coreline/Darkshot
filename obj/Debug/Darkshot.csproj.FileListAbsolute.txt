@@ -22,3 +22,14 @@ C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Dar
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.exe
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.pdb
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\bin\Debug\Darkshot.exe.config
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\bin\Debug\Darkshot.exe
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\bin\Debug\Darkshot.pdb
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.g.resources
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.AboutForm.resources
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.Properties.Resources.resources
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.CaptureForm.resources
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.csproj.GenerateResource.cache
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.exe
+C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.pdb
