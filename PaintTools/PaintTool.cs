@@ -3,6 +3,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Windows.Forms;
+using Keyboard = System.Windows.Input.Keyboard;
+using Key = System.Windows.Input.Key;
 
 namespace Darkshot.PaintTools
 {
@@ -28,7 +30,7 @@ namespace Darkshot.PaintTools
         protected event MouseEventHandler MouseMove;
         protected event MouseEventHandler MouseUp;
 
-        public static PaintTool Create(PaintToolType func, Color color, Color bg)
+        public static PaintTool Create(PaintToolType func, Color color)
         {
             switch (func)
             {
@@ -45,15 +47,15 @@ namespace Darkshot.PaintTools
                 case PaintToolType.Text:
                     return new PaintToolText(color);
                 case PaintToolType.Marker:
-                    return new PaintToolMarker(bg);
+                    return new PaintToolMarker(color);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public static Cursor GetDefaultCursor(PaintToolType func)
+        public virtual Cursor GetDefaultCursor()
         {
-            return func == PaintToolType.Text ? Cursors.IBeam : Cursors.Default;
+            return Cursors.Default;
         }
 
         public virtual Rectangle GetBounds()
@@ -70,7 +72,6 @@ namespace Darkshot.PaintTools
             e.Graphics.CompositingQuality = CompositingQuality.HighQuality;
             e.Graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            //e.Graphics.TextContrast = 0;
 
             Paint.Invoke(sender, e);
         }
@@ -134,6 +135,16 @@ namespace Darkshot.PaintTools
             var h = Math.Max(bounds.Y + bounds.Height, roi.Y + roi.Height) - y;
             var rect = new Rectangle(x, y, w, h);
             canvas.Invalidate(rect);
+        }
+
+        protected bool IsShiftDown()
+        {
+            return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+        }
+
+        protected bool IsCtrlDown()
+        {
+            return Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
         }
     }
 }

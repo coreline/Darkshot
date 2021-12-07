@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Keyboard = System.Windows.Input.Keyboard;
-using Key = System.Windows.Input.Key;
 
 namespace Darkshot.PaintTools
 {
@@ -28,6 +26,17 @@ namespace Darkshot.PaintTools
             _pointStart = Point.Empty;
             _pointEnd = Point.Empty;
             _drawing = false;
+        }
+
+        public override Rectangle GetBounds()
+        {
+            const int radius = 20;
+            var rect = new Rectangle();
+            rect.X = Math.Min(_pointStart.X, _pointEnd.X) - radius;
+            rect.Y = Math.Min(_pointStart.Y, _pointEnd.Y) - radius;
+            rect.Width = Math.Abs(_pointStart.X - _pointEnd.X) + 2 * radius;
+            rect.Height = Math.Abs(_pointStart.Y - _pointEnd.Y) + 2 * radius;
+            return rect;
         }
 
         void onPaint(Graphics g)
@@ -68,35 +77,24 @@ namespace Darkshot.PaintTools
         void setEndPoint(Point point)
         {
             _pointLast = point;
-            _pointEnd = point;
-
-            if (!Keyboard.IsKeyDown(Key.LeftShift))
-                return;
-
-            var dx = Math.Abs(_pointEnd.X - _pointStart.X);
-            var dy = Math.Abs(_pointEnd.Y - _pointStart.Y);
-            var posX = _pointStart.X + Math.Sign(_pointEnd.X - _pointStart.X) * Math.Max(dx, dy);
-            var posY = _pointStart.Y + Math.Sign(_pointEnd.Y - _pointStart.Y) * Math.Max(dx, dy);
-            var lenZ = (int)Math.Sqrt(Math.Pow(posX - _pointStart.X, 2) + Math.Pow(posY - _pointStart.Y, 2));
-            var dz = (int)Math.Abs(lenZ - Math.Sqrt(dx * dx + dy * dy));
-            var min = Math.Min(Math.Min(dx, dy), dz);
-            if (min == dx)
-                _pointEnd.X = _pointStart.X;
-            else if (min == dy)
-                _pointEnd.Y = _pointStart.Y;
-            else
-                _pointEnd = new Point(posX, posY);
+            _pointEnd = IsShiftDown() ? getStraightLine(_pointStart, point) : point;
         }
 
-        public override Rectangle GetBounds()
+        Point getStraightLine(Point start, Point end)
         {
-            const int radius = 20;
-            var rect = new Rectangle();
-            rect.X = Math.Min(_pointStart.X, _pointEnd.X) - radius;
-            rect.Y = Math.Min(_pointStart.Y, _pointEnd.Y) - radius;
-            rect.Width = Math.Abs(_pointStart.X - _pointEnd.X) + 2 * radius;
-            rect.Height = Math.Abs(_pointStart.Y - _pointEnd.Y) + 2 * radius;
-            return rect;
+            var w = Math.Abs(end.X - start.X);
+            var h = Math.Abs(end.Y - start.Y);
+            var x = start.X + Math.Sign(end.X - start.X) * Math.Max(w, h);
+            var y = start.Y + Math.Sign(end.Y - start.Y) * Math.Max(w, h);
+            var t = (int)Math.Sqrt(Math.Pow(x - start.X, 2) + Math.Pow(y - start.Y, 2));
+            var z = (int)Math.Abs(t - Math.Sqrt(w * w + h * h));
+            var min = Math.Min(Math.Min(w, h), z);
+
+            if (min == w)
+                return new Point(start.X, end.Y);
+            if (min == h)
+                return new Point(end.X, start.Y);
+            return new Point(x, y);
         }
     }
 }

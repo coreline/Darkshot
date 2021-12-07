@@ -246,7 +246,7 @@ namespace Darkshot
             var func = sender as ToolStripButton;
             func.Checked = !func.Checked;
             _toolType = func.Checked ? (PaintToolType)func.Tag : PaintToolType.None;
-            Cursor = PaintTool.GetDefaultCursor(_toolType);
+            SetDefaultCursor();
             RefreshColorIcon();
         }
 
@@ -260,7 +260,10 @@ namespace Darkshot
             {
                 dialog.Color = CurrentColor;
                 if (dialog.ShowDialog() == DialogResult.OK)
+                {
                     CurrentColor = dialog.Color;
+                    SetDefaultCursor();
+                }
             }
             RefreshColorIcon();
         }
@@ -336,16 +339,28 @@ namespace Darkshot
                 return _area;
             if (_tool == null && createIfNeed)
             {
-                _tool = PaintTool.Create(_toolType, _color, _mark);
+                _tool = CreatePaintTool();
                 _tool.Complete += (s, e) =>
                 {
                     _actionsTodo.Add(_tool);
                     _actionsUndo.Clear();
                     _tool = null;
-                    Cursor = PaintTool.GetDefaultCursor(_toolType);
+                    SetDefaultCursor();
                 };
             }
             return _tool;
+        }
+
+        private void SetDefaultCursor()
+        {
+            Cursor = _toolType == PaintToolType.None
+                ? Cursors.Default
+                : CreatePaintTool().GetDefaultCursor();
+        }
+
+        private PaintTool CreatePaintTool()
+        {
+            return PaintTool.Create(_toolType, CurrentColor);
         }
     }
 }

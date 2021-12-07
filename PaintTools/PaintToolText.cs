@@ -228,6 +228,11 @@ namespace Darkshot.PaintTools
             return bounds;
         }
 
+        public override Cursor GetDefaultCursor()
+        {
+            return Cursors.IBeam;
+        }
+
         void RecalcBounds()
         {
             _rect = new Rectangle(_textBox.Location, _textBox.Size);
