@@ -100,10 +100,14 @@ namespace Darkshot
                 return;
             if (saveFileDialog.Tag?.ToString() == true.ToString())
                 return;
+
             saveFileDialog.Tag = true.ToString();
-            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+            var dialogResult = saveFileDialog.ShowDialog();
+            saveFileDialog.Tag = string.Empty;
+
+            if (dialogResult != DialogResult.OK)
                 return;
-            if (saveFileDialog.FileName == string.Empty)
+            if (string.IsNullOrEmpty(saveFileDialog.FileName))
                 return;
             try
             {
@@ -114,7 +118,6 @@ namespace Darkshot
             {
                 MessageBox.Show(e.Message, "Ошибка сохранения", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            saveFileDialog.Tag = string.Empty;
             Close();
         }
 
