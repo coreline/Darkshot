@@ -13,6 +13,11 @@ namespace Darkshot
         [STAThread]
         static void Main()
         {
+            var scale = (int)(100 * Screen.PrimaryScreen.Bounds.Width
+                                  / System.Windows.SystemParameters.PrimaryScreenWidth);
+            if (scale < 1) // Для инициализации масштаба, иначе разрешение формы не корректное
+                new Exception("Wrong screen scale");
+
             var assembly = typeof(Program).Assembly;
             var attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
             var appGuid = attribute.Value;

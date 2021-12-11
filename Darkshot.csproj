@@ -53,6 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -79,11 +80,15 @@
     <Compile Include="CaptureForm.Designer.cs">
       <DependentUpon>CaptureForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CustomColorDialog.cs">
+    <Compile Include="Controls\CanvasTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\CustomColorDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Gdi32.cs" />
     <Compile Include="GlobalKeyboardHook.cs" />
+    <Compile Include="NativeVirtualScreen.cs" />
     <Compile Include="PaintTools\PaintTool.cs" />
     <Compile Include="PaintTools\PaintToolFilledRectangle.cs" />
     <Compile Include="PaintTools\PaintToolArrow.cs" />

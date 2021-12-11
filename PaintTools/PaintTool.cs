@@ -10,7 +10,7 @@ namespace Darkshot.PaintTools
 {
     enum PaintToolType
     {
-        None,
+        Workarea,
         Pen,
         Line,
         Arrow,
@@ -26,6 +26,7 @@ namespace Darkshot.PaintTools
         protected event PaintEventHandler Paint;
         protected event KeyEventHandler KeyDown;
         protected event KeyEventHandler KeyUp;
+        protected event KeyPressEventHandler KeyPress;
         protected event MouseEventHandler MouseDown;
         protected event MouseEventHandler MouseMove;
         protected event MouseEventHandler MouseUp;
@@ -60,7 +61,7 @@ namespace Darkshot.PaintTools
 
         public virtual Rectangle GetBounds()
         {
-            return SystemInformation.VirtualScreen;
+            return NativeVirtualScreen.Bounds;
         }
 
         public void RaisePaint(Control sender, PaintEventArgs e)
@@ -91,6 +92,15 @@ namespace Darkshot.PaintTools
                 return;
             var bounds = GetBounds();
             KeyUp.Invoke(sender, e);
+            Invalidate(sender, bounds);
+        }
+
+        public void RaiseKeyPress(Control sender, KeyPressEventArgs e)
+        {
+            if (KeyPress == null)
+                return;
+            var bounds = GetBounds();
+            KeyPress.Invoke(sender, e);
             Invalidate(sender, bounds);
         }
 

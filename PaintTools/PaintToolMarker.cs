@@ -48,7 +48,7 @@ namespace Darkshot.PaintTools
         public override Rectangle GetBounds()
         {
             if (_points.Count == 0)
-                return SystemInformation.VirtualScreen;
+                return NativeVirtualScreen.Bounds;
 
             var minX = _points.Min(p => p.X);
             var minY = _points.Min(p => p.Y);

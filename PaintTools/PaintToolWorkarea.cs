@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using Keyboard = System.Windows.Input.Keyboard;
+using Key = System.Windows.Input.Key;
 
 namespace Darkshot.PaintTools
 {
@@ -27,6 +29,7 @@ namespace Darkshot.PaintTools
             MouseDown += (s, e) => { onMouseDown(s as Control, e); };
             MouseUp += (s, e) => { onMouseUp(s as Control, e); };
             MouseMove += (s, e) => { onMouseMove(s as Control, e); };
+            KeyDown += (s, e) => { onKeyDown(s as Control, e); };
 
             this.IsEmpty = true;
             this.IsCreating = false;
@@ -93,6 +96,28 @@ namespace Darkshot.PaintTools
             RoiMode = RoiModeType.None;
             canvas.Cursor = _cursor;
             RaiseComplete();
+        }
+
+        void onKeyDown(Control canvas, KeyEventArgs e)
+        {
+            if (IsCreating)
+                return;
+            var left = Keyboard.IsKeyDown(Key.Left) ? 1 : 0;
+            var right = Keyboard.IsKeyDown(Key.Right) ? 1 : 0;
+            var up = Keyboard.IsKeyDown(Key.Up) ? 1 : 0;
+            var down = Keyboard.IsKeyDown(Key.Down) ? 1 : 0;
+            var scale = IsShiftDown() ? 1 : 0;
+            var move = 1 - scale;
+            var dx = right - left;
+            var dy = down - up;
+            if (dx == 0 && dy == 0)
+                return;
+            var x = Roi.X + move * dx;
+            var y = Roi.Y + move * dy;
+            var w = Roi.Width + scale * dx;
+            var h = Roi.Height + scale * dy;
+            Roi = new Rectangle(x, y, w, h);
+            RefreshRoi();
         }
 
         void onPaint(Control canvas, Graphics g)
@@ -227,7 +252,11 @@ namespace Darkshot.PaintTools
                     return;
             }
             Roi = roi;
+            RefreshRoi();
+        }
 
+        void RefreshRoi()
+        {
             _resizePoints[0] = new Point(Roi.X, Roi.Y);
             _resizePoints[1] = new Point(Roi.X + Roi.Width / 2, Roi.Y);
             _resizePoints[2] = new Point(Roi.X + Roi.Width, Roi.Y);

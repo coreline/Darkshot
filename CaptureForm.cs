@@ -11,6 +11,7 @@ using System.Security.Permissions;
 using System.Windows.Forms;
 using Darkshot.Gdi32;
 using System.Threading;
+using Darkshot.Controls;
 
 namespace Darkshot
 {
@@ -47,12 +48,11 @@ namespace Darkshot
 #if DEBUG
             TopMost = false;
 #endif
-            Location = SystemInformation.VirtualScreen.Location;
-            Size = SystemInformation.VirtualScreen.Size;
-            ClientSize = SystemInformation.VirtualScreen.Size;
-            MaximumSize = SystemInformation.VirtualScreen.Size;
-            MinimumSize = SystemInformation.VirtualScreen.Size;
-
+            Location = NativeVirtualScreen.Bounds.Location;
+            Size = NativeVirtualScreen.Bounds.Size;
+            ClientSize = NativeVirtualScreen.Bounds.Size;
+            MaximumSize = NativeVirtualScreen.Bounds.Size;
+            MinimumSize = NativeVirtualScreen.Bounds.Size;
             RefreshColorIcon();
             Invalidate();
 
@@ -70,7 +70,11 @@ namespace Darkshot
 
         void InitializeCaptureBitmap()
         {
-            var rect = SystemInformation.VirtualScreen;
+            var scale = (int)(100 * Screen.PrimaryScreen.Bounds.Width 
+                                  / System.Windows.SystemParameters.PrimaryScreenWidth);
+            if (scale < 1) // Для инициализации масштаба, иначе разрешение формы не корректное
+                new Exception("Wrong screen scale");
+            var rect = NativeVirtualScreen.Bounds;
             _area = new PaintToolWorkarea();
 
             _bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
@@ -80,7 +84,7 @@ namespace Darkshot
 
         public bool IsPainting()
         {
-            return GetPaintTool() != null && _toolType != PaintToolType.None;
+            return GetPaintTool() != null && _toolType != PaintToolType.Workarea;
         }
 
         public void CopyToClipboard()
@@ -215,11 +219,19 @@ namespace Darkshot
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             GetPaintTool()?.RaiseKeyDown(this, e);
+            RefreshToolsLocation();
         }
 
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
             GetPaintTool()?.RaiseKeyUp(this, e);
+            RefreshToolsLocation();
+        }
+
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            GetPaintTool()?.RaiseKeyPress(this, e);
+            RefreshToolsLocation();
         }
 
         private void OnPaint(object sender, PaintEventArgs e)
@@ -248,7 +260,7 @@ namespace Darkshot
             }
             var func = sender as ToolStripButton;
             func.Checked = !func.Checked;
-            _toolType = func.Checked ? (PaintToolType)func.Tag : PaintToolType.None;
+            _toolType = func.Checked ? (PaintToolType)func.Tag : PaintToolType.Workarea;
             SetDefaultCursor();
             RefreshColorIcon();
         }
@@ -294,35 +306,46 @@ namespace Darkshot
 
             if (!_area.IsCreating && !toolsPaint.Visible && _tool == null)
             {
-                int margin = 7;
+                RefreshToolsLocation();
 
-                var paintLeft = _area.Roi.X + _area.Roi.Width + margin;
-                paintLeft = Math.Max(paintLeft, margin);
-                paintLeft = Math.Min(paintLeft, _bitmap.Width - toolsPaint.Width - margin);
-
-                var appLeft = _area.Roi.X + _area.Roi.Width - toolsApp.Width;
-                appLeft = Math.Min(appLeft, paintLeft - toolsApp.Width - margin);
-                appLeft = Math.Max(appLeft, margin);
-
-                var appTop = _area.Roi.Y + _area.Roi.Height + margin;
-                appTop = Math.Min(appTop, _bitmap.Height - toolsApp.Height - margin);
-                appTop = Math.Max(appTop, margin);
-
-                var paintTop = _area.Roi.Y + _area.Roi.Height - toolsPaint.Height;
-                paintTop = Math.Min(paintTop, appTop - toolsPaint.Height - margin);
-                paintTop = Math.Max(paintTop, margin);
-
-                if (paintLeft < appLeft + toolsApp.Width + margin &&
-                    appTop < paintTop + toolsPaint.Height + margin)
-                    appLeft = paintLeft + toolsPaint.Width + margin;
-
-                toolsPaint.Location = new Point(paintLeft, paintTop);
                 toolsPaint.Visible = true;
-
-                toolsApp.Location = new Point(appLeft, appTop);
                 toolsApp.Visible = true;
             }
         }
+
+        private void RefreshToolsLocation()
+        {
+            int margin = 7;
+
+            var paintLeft = _area.Roi.X + _area.Roi.Width + margin;
+            paintLeft = Math.Max(paintLeft, margin);
+            paintLeft = Math.Min(paintLeft, _bitmap.Width - toolsPaint.Width - margin);
+
+            var appLeft = _area.Roi.X + _area.Roi.Width - toolsApp.Width;
+            appLeft = Math.Min(appLeft, paintLeft - toolsApp.Width - margin);
+            appLeft = Math.Max(appLeft, margin);
+
+            var appTop = _area.Roi.Y + _area.Roi.Height + margin;
+            appTop = Math.Min(appTop, _bitmap.Height - toolsApp.Height - margin);
+            appTop = Math.Max(appTop, margin);
+
+            var paintTop = _area.Roi.Y + _area.Roi.Height - toolsPaint.Height;
+            paintTop = Math.Min(paintTop, appTop - toolsPaint.Height - margin);
+            paintTop = Math.Max(paintTop, margin);
+
+            if (paintLeft < appLeft + toolsApp.Width + margin &&
+                appTop < paintTop + toolsPaint.Height + margin)
+                appLeft = paintLeft + toolsPaint.Width + margin;
+
+            var paintToolsLocation = new Point(paintLeft, paintTop);
+            if (toolsPaint.Location != paintToolsLocation)
+                toolsPaint.Location = paintToolsLocation;
+
+            var appToolsLocation = new Point(appLeft, appTop);
+            if (toolsApp.Location != appToolsLocation)
+                toolsApp.Location = appToolsLocation;
+        }
+
         private void HideTools()
         {
             if (toolTipSelRegion != null)
@@ -338,7 +361,7 @@ namespace Darkshot
 
         private PaintTool GetPaintTool(bool createIfNeed = false)
         {
-            if (_toolType == PaintToolType.None)
+            if (_toolType == PaintToolType.Workarea)
                 return _area;
             if (_tool == null && createIfNeed)
             {
@@ -356,7 +379,7 @@ namespace Darkshot
 
         private void SetDefaultCursor()
         {
-            Cursor = _toolType == PaintToolType.None
+            Cursor = _toolType == PaintToolType.Workarea
                 ? Cursors.Default
                 : CreatePaintTool().GetDefaultCursor();
         }

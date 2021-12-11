@@ -22,14 +22,21 @@ namespace Darkshot.Gdi32
             Bitmap bitmap;
             using (Graphics gScr = control.CreateGraphics())
             {
-                bitmap = new Bitmap(roi.Width, roi.Height, gScr);
+                bitmap = new Bitmap(Math.Abs(roi.Width), Math.Abs(roi.Height), gScr);
                 using (Graphics gDest = Graphics.FromImage(bitmap))
                 {
-                    IntPtr dc1Src = gScr.GetHdc();
-                    IntPtr dcDest = gDest.GetHdc();
-                    BitBlt(dcDest, 0, 0, roi.Width, roi.Height, dc1Src, roi.X, roi.Y, SRCCOPY);
-                    gScr.ReleaseHdc(dc1Src);
-                    gDest.ReleaseHdc(dcDest);
+                    if (roi.Width < 0 || roi.Height < 0)
+                    {
+                        gDest.Clear(Color.Black);
+                    }
+                    else
+                    {
+                        IntPtr dc1Src = gScr.GetHdc();
+                        IntPtr dcDest = gDest.GetHdc();
+                        BitBlt(dcDest, 0, 0, roi.Width, roi.Height, dc1Src, roi.X, roi.Y, SRCCOPY);
+                        gScr.ReleaseHdc(dc1Src);
+                        gDest.ReleaseHdc(dcDest);
+                    }
                 }
             }
 

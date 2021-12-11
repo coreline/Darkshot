@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Darkshot
+namespace Darkshot.Controls
 {
     internal class CustomColorDialog : ColorDialog
     {
@@ -108,10 +108,10 @@ namespace Darkshot
             const int margin = 3;
             var w = rect.Right - rect.Left;
             var h = rect.Bottom - rect.Top;
-            var x = SystemInformation.VirtualScreen.X + _right - w;
-            var y = SystemInformation.VirtualScreen.Y + _bottom - h;
-            x = Math.Max(x, SystemInformation.VirtualScreen.X + margin);
-            y = Math.Max(y, SystemInformation.VirtualScreen.Y + margin);
+            var x = NativeVirtualScreen.Bounds.X + _right - w;
+            var y = NativeVirtualScreen.Bounds.Y + _bottom - h;
+            x = Math.Max(x, NativeVirtualScreen.Bounds.X + margin);
+            y = Math.Max(y, NativeVirtualScreen.Bounds.Y + margin);
             SetWindowPos(hWnd, HWND_TOP, x, y, 0, 0, UFLAGS);
 
             return hookProc;

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -38,6 +39,8 @@ namespace Darkshot
 
         private void Capture(object sender, EventArgs e)
         {
+            var rectNative = NativeVirtualScreen.Bounds;
+            var rectVirtual = SystemInformation.VirtualScreen;
             _isCaptured = true;
             _captureForm = new CaptureForm();
             _captureForm.ShowDialog();
