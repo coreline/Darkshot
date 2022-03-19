@@ -8,41 +8,38 @@ namespace Darkshot
     internal class NativeVirtualScreen
     {
         #region Class section
-        public static Rectangle Bounds { get; private set; }
+        public static Rectangle Bounds { get { return SystemInformation.VirtualScreen; } }
 
         static NativeVirtualScreen()
         {
-            Bounds = SystemInformation.VirtualScreen;
-            return;
+            //// Initialize the virtual screen to dummy values
+            //int left = int.MaxValue;
+            //int top = int.MaxValue;
+            //int right = int.MinValue;
+            //int bottom = int.MinValue;
 
-            // Initialize the virtual screen to dummy values
-            int left = int.MaxValue;
-            int top = int.MaxValue;
-            int right = int.MinValue;
-            int bottom = int.MinValue;
+            //// Enumerate system display devices
+            //int deviceIndex = 0;
+            //while (true)
+            //{
+            //    DisplayDevice deviceData = new DisplayDevice { cb = Marshal.SizeOf(typeof(DisplayDevice)) };
+            //    if (EnumDisplayDevices(null, deviceIndex, ref deviceData, 0) == 0)
+            //        break;
 
-            // Enumerate system display devices
-            int deviceIndex = 0;
-            while (true)
-            {
-                DisplayDevice deviceData = new DisplayDevice { cb = Marshal.SizeOf(typeof(DisplayDevice)) };
-                if (EnumDisplayDevices(null, deviceIndex, ref deviceData, 0) == 0)
-                    break;
+            //    // Get the position and size of this particular display device
+            //    DEVMODE devMode = new DEVMODE();
+            //    if (EnumDisplaySettings(deviceData.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode))
+            //    {
+            //        // Update the virtual screen dimensions
+            //        left = Math.Min(left, devMode.dmPositionX);
+            //        top = Math.Min(top, devMode.dmPositionY);
+            //        right = Math.Max(right, devMode.dmPositionX + devMode.dmPelsWidth);
+            //        bottom = Math.Max(bottom, devMode.dmPositionY + devMode.dmPelsHeight);
+            //    }
+            //    deviceIndex++;
+            //}
 
-                // Get the position and size of this particular display device
-                DEVMODE devMode = new DEVMODE();
-                if (EnumDisplaySettings(deviceData.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode))
-                {
-                    // Update the virtual screen dimensions
-                    left = Math.Min(left, devMode.dmPositionX);
-                    top = Math.Min(top, devMode.dmPositionY);
-                    right = Math.Max(right, devMode.dmPositionX + devMode.dmPelsWidth);
-                    bottom = Math.Max(bottom, devMode.dmPositionY + devMode.dmPelsHeight);
-                }
-                deviceIndex++;
-            }
-
-            Bounds = new Rectangle(left, top, right - left, bottom - top);
+            //Bounds = new Rectangle(left, top, right - left, bottom - top);
         }
         #endregion
 
