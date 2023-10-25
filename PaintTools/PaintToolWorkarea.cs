@@ -30,6 +30,7 @@ namespace Darkshot.PaintTools
             MouseUp += (s, e) => { onMouseUp(s as Control, e); };
             MouseMove += (s, e) => { onMouseMove(s as Control, e); };
             KeyDown += (s, e) => { onKeyDown(s as Control, e); };
+            KeyUp += (s, e) => { onKeyUp(s as Control, e); };
 
             this.IsEmpty = true;
             this.IsCreating = false;
@@ -61,16 +62,15 @@ namespace Darkshot.PaintTools
 
         void onMouseDown(Control canvas, MouseEventArgs e)
         {
+            IsCreating = true;
             if (IsEmpty)
             {
                 IsEmpty = false;
-                IsCreating = true;
                 RoiMode = RoiModeType.Corner;
                 RefreshRoi(e.Location);
             }
             else if (RoiMode != RoiModeType.None)
             {
-                IsCreating = true;
                 StartResizeRoi(e.Location);
                 RefreshRoi(e.Location);
             }
@@ -120,6 +120,10 @@ namespace Darkshot.PaintTools
             RefreshRoi();
         }
 
+        void onKeyUp(Control canvas, KeyEventArgs e)
+        {
+        }
+
         void onPaint(Control canvas, Graphics g)
         {
             var roi = this.Roi;
@@ -148,6 +152,54 @@ namespace Darkshot.PaintTools
 
             g.FillRectangles(Brushes.White, _resizeRectangles);
             g.DrawRectangles(Pens.Black, _resizeRectangles);
+
+            if (IsCreating || IsShiftDown())
+            {
+                var bitmapRoi = roi;
+                if (bitmapRoi.X < 0)
+                {
+                    bitmapRoi.Width -= Math.Abs(bitmapRoi.X);
+                    bitmapRoi.X = 0;
+                }
+                if (bitmapRoi.Y < 0)
+                {
+                    bitmapRoi.Height -= Math.Abs(bitmapRoi.Y);
+                    bitmapRoi.Y = 0;
+                }
+                if (bitmapRoi.Right > size.Width)
+                    bitmapRoi.Width -= bitmapRoi.Right - size.Width;
+                if (bitmapRoi.Bottom > size.Height)
+                    bitmapRoi.Height -= bitmapRoi.Bottom - size.Height;
+                bitmapRoi.Width = Math.Max(0, bitmapRoi.Width);
+                bitmapRoi.Height = Math.Max(0, bitmapRoi.Height);
+
+                var text = string.Format("[{0}×{1}]px", bitmapRoi.Width, bitmapRoi.Height);
+                var font = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular, GraphicsUnit.Pixel);
+                var fontMargin = new Point(10, 10);
+                var fontPadding = new Point(4, 2);
+                var fontSize = g.MeasureString(text, font); ;
+                var fontRoi = new Rectangle(bitmapRoi.X,
+                                            bitmapRoi.Y - (int)fontSize.Height - fontPadding.Y - 4, 
+                                            (int)fontSize.Width + 2 * fontPadding.X, 
+                                            (int)fontSize.Height + 2 * fontPadding.Y);
+
+                fontRoi.X = Math.Max(fontMargin.X, fontRoi.X);
+                fontRoi.Y = Math.Max(fontMargin.Y, fontRoi.Y);
+                if (fontRoi.Right + fontMargin.X > size.Width)
+                    fontRoi.X = size.Width - fontMargin.X - fontRoi.Width;
+                if (fontRoi.Bottom + fontMargin.Y > size.Height)
+                    fontRoi.Y = size.Height - fontMargin.Y - fontRoi.Height;
+
+                using (var brush = new SolidBrush(Color.FromArgb(192, Color.White)))
+                    g.FillRectangle(brush, fontRoi);
+                using (var pen = new Pen(Color.Black))
+                {
+                    pen.Width = 1;
+                    pen.DashCap = DashCap.Flat;
+                    g.DrawRectangle(pen, fontRoi);
+                }
+                g.DrawString(text, font, Brushes.Black, fontRoi.X, fontRoi.Y);
+            }
         }
 
         void RefreshPossibleRoiMode(Point p)
