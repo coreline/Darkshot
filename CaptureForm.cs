@@ -70,7 +70,7 @@ namespace Darkshot
 
         void InitializeCaptureBitmap()
         {
-            var scale = (int)(100 * Screen.PrimaryScreen.Bounds.Width 
+            var scale = (int)(100 * Screen.PrimaryScreen.Bounds.Width
                                   / System.Windows.SystemParameters.PrimaryScreenWidth);
             if (scale < 1) // Для инициализации масштаба, иначе разрешение формы не корректное
                 new Exception("Wrong screen scale");
@@ -152,12 +152,22 @@ namespace Darkshot
             using (var form = new Form())
             {
                 form.Opacity = 0;
-                form.Location = new Point(-Location.X, -Location.Y);
-                form.Size = Size;
                 form.Visible = true;
+                form.FormBorderStyle = FormBorderStyle.None;
+                form.Location = this.Location;
+                form.Size = this.Size;
+                form.ClientSize = this.Size;
+                form.MaximumSize = this.Size;
+                form.MinimumSize = this.Size;
 
                 using (var g = form.CreateGraphics())
-                    OnPaint(form, new PaintEventArgs(g, roi));
+                {
+                    g.DrawImageUnscaled(_bitmap, Point.Empty);
+                    foreach (var item in _actionsTodo)
+                        item.RaisePaint(this, new PaintEventArgs(g, roi));
+                    _tool?.RaisePaint(this, new PaintEventArgs(g, roi));
+                }
+
                 using (var bitmap = form.CaptureControl(roi))
                 using (var stream = new MemoryStream())
                 {
@@ -241,8 +251,7 @@ namespace Darkshot
             foreach (var item in _actionsTodo)
                 item.RaisePaint(this, e);
             _tool?.RaisePaint(this, e);
-            if (sender == this)
-                _area.RaisePaint(this, e);
+            _area.RaisePaint(this, e);
         }
 
         private void OnToolPaintClick(object sender, EventArgs e)

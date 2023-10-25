@@ -32,3 +32,16 @@ C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Release\Darkshot.csproj.Gene
 C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Release\Darkshot.csproj.CoreCompileInputs.cache
 C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Release\Darkshot.exe
 C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Release\Darkshot.pdb
+C:\Users\Kernel\source\repos\Darkshot\bin\Release\Darkshot.exe.config
+C:\Users\Kernel\source\repos\Darkshot\bin\Release\Darkshot.exe
+C:\Users\Kernel\source\repos\Darkshot\bin\Release\Darkshot.pdb
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.csproj.AssemblyReference.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.csproj.SuggestedBindingRedirects.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.g.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.AboutForm.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.Properties.Resources.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.CaptureForm.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.csproj.GenerateResource.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.csproj.CoreCompileInputs.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.exe
+C:\Users\Kernel\source\repos\Darkshot\obj\Release\Darkshot.pdb

@@ -33,3 +33,16 @@ C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.csproj.CoreCo
 C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.exe
 C:\Users\A.Nosov\Source\Repos\coreline\Darkshot\obj\Debug\Darkshot.pdb
 C:\Users\a\OneDrive\Документы\Visual Studio 2022\Darkshot\obj\Debug\Darkshot.CaptureForm.resources
+C:\Users\Kernel\source\repos\Darkshot\bin\Debug\Darkshot.exe.config
+C:\Users\Kernel\source\repos\Darkshot\bin\Debug\Darkshot.exe
+C:\Users\Kernel\source\repos\Darkshot\bin\Debug\Darkshot.pdb
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.csproj.AssemblyReference.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.csproj.SuggestedBindingRedirects.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.g.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.AboutForm.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.Properties.Resources.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.CaptureForm.resources
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.csproj.GenerateResource.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.csproj.CoreCompileInputs.cache
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.exe
+C:\Users\Kernel\source\repos\Darkshot\obj\Debug\Darkshot.pdb

@@ -5,17 +5,18 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Linq;
 using System.Drawing.Imaging;
+using Darkshot.Gdi32;
 
 namespace Darkshot.PaintTools
 {
     class PaintToolMarker : PaintTool
     {
-        const float PEN_WIDTH = 24;
+        const float PEN_WIDTH = 26;
         Cursor _cursor;
         Point _pointLast;
         List<Point> _points;
-        Pen _pen;
         bool _drawing;
+        Pen _pen;
 
         public PaintToolMarker(Color color)
         {
@@ -26,19 +27,15 @@ namespace Darkshot.PaintTools
             KeyDown += (s, e) => { refreshPoints(); };
             KeyUp += (s, e) => { refreshPoints(); };
 
-            _pen = new Pen(Color.FromArgb(127, color), PEN_WIDTH);
-            _pen.StartCap = LineCap.Round;
-            _pen.EndCap = LineCap.Round;
-            _pen.LineJoin = LineJoin.Round;
             _points = new List<Point>();
+            _pen = createPen(color, 255);
             _drawing = false;
 
             using (var bitmap = new Bitmap((int)PEN_WIDTH + 2, (int)PEN_WIDTH + 2, PixelFormat.Format32bppArgb))
             using (var g = Graphics.FromImage(bitmap))
             {
                 var rect = new RectangleF(1, 1, bitmap.Width - 2, bitmap.Height - 2);
-                g.FillEllipse(_pen.Brush, rect);
-                g.FillEllipse(_pen.Brush, rect);
+                g.FillEllipse(createPen(color, 127).Brush, rect);
                 using (var pen = new Pen(color, 1))
                     g.DrawEllipse(pen, rect);
                 _cursor = new Cursor(bitmap.GetHicon());
@@ -70,18 +67,31 @@ namespace Darkshot.PaintTools
             if (_points.Count < 1)
                 return;
 
-            if (_points.Count == 1)
+            var bounds = GetBounds();
+            using (var bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format32bppArgb))
             {
-                var w = PEN_WIDTH;
-                var r = w / 2;
-                var x = _points[0].X - r;
-                var y = _points[0].Y - r;
-                var rect = new RectangleF(x, y, w, w);
-                g.FillEllipse(_pen.Brush, rect);
-            }
-            else
-            {
-                g.DrawLines(_pen, _points.ToArray());
+                using (var source = Graphics.FromImage(bitmap))
+                {
+                    source.Clear(Color.White);
+                    List<Point> points = new List<Point>();
+                    foreach (var point in _points)
+                        points.Add(new Point(point.X - bounds.Left, point.Y - bounds.Top));
+                    
+                    if (_points.Count == 1)
+                    {
+                        var w = PEN_WIDTH;
+                        var r = w / 2;
+                        var x = points[0].X - r;
+                        var y = points[0].Y - r;
+                        var rect = new RectangleF(x, y, w, w);
+                        source.FillEllipse(_pen.Brush, rect);
+                    }
+                    else
+                    {
+                        source.DrawLines(_pen, points.ToArray());
+                    }
+                }
+                g.PasteBitmap(bitmap, bounds.Left, bounds.Top, CopyPixelOperation.SourceAnd);
             }
         }
 
@@ -140,6 +150,15 @@ namespace Darkshot.PaintTools
             if (min == h)
                 return new Point(end.X, start.Y);
             return new Point(x, y);
+        }
+
+        Pen createPen(Color color, int alpha)
+        {
+            var pen = new Pen(Color.FromArgb(alpha, color), PEN_WIDTH);
+            pen.StartCap = LineCap.Round;
+            pen.EndCap = LineCap.Round;
+            pen.LineJoin = LineJoin.Round;
+            return pen;
         }
     }
 }

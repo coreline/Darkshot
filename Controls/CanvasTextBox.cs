@@ -8,7 +8,7 @@ namespace Darkshot.Controls
         public CanvasTextBox()
         {
             BorderStyle = BorderStyle.None;
-            Font = new Font(FontFamily.GenericSansSerif, 18, FontStyle.Regular, GraphicsUnit.Pixel);
+            Font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Regular, GraphicsUnit.Pixel);
             Location = Point.Empty;
             Margin = new Padding(0);
             Multiline = true;
