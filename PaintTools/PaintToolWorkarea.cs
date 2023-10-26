@@ -153,7 +153,7 @@ namespace Darkshot.PaintTools
             g.FillRectangles(Brushes.White, _resizeRectangles);
             g.DrawRectangles(Pens.Black, _resizeRectangles);
 
-            if (IsCreating || IsShiftDown())
+            if (IsCreating && (RoiMode == RoiModeType.Corner || RoiMode == RoiModeType.Horizontal || RoiMode == RoiModeType.Vertical) || IsShiftDown())
             {
                 var bitmapRoi = roi;
                 if (bitmapRoi.X < 0)
@@ -190,13 +190,14 @@ namespace Darkshot.PaintTools
                 if (fontRoi.Bottom + fontMargin.Y > size.Height)
                     fontRoi.Y = size.Height - fontMargin.Y - fontRoi.Height;
 
-                using (var brush = new SolidBrush(Color.FromArgb(192, Color.White)))
+                using (var brush = new SolidBrush(Color.FromArgb(127, Color.White)))
                     g.FillRectangle(brush, fontRoi);
                 using (var pen = new Pen(Color.Black))
                 {
                     pen.Width = 1;
                     pen.DashCap = DashCap.Flat;
                     g.DrawRectangle(pen, fontRoi);
+                    
                 }
                 g.DrawString(text, font, Brushes.Black, fontRoi.X, fontRoi.Y);
             }
