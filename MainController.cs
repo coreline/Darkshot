@@ -96,6 +96,8 @@ namespace Darkshot
             {
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.OemTilde))
                     Capture(sender, e);
+                if (Keyboard.IsKeyDown(Key.LWin) && Keyboard.IsKeyDown(Key.Escape))
+                    Capture(sender, e);
                 else if (Keyboard.IsKeyDown(Key.PrintScreen))
                     Capture(sender, e);
             }

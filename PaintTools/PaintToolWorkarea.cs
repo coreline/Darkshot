@@ -175,31 +175,25 @@ namespace Darkshot.PaintTools
 
                 var text = string.Format("[{0}×{1}]px", bitmapRoi.Width, bitmapRoi.Height);
                 var font = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular, GraphicsUnit.Pixel);
-                var fontMargin = new Point(10, 10);
-                var fontPadding = new Point(4, 2);
+                var fontFrameMargin = 4;
+                var fontBoundsMargin = new Point(100, 20);
+                var fontPadding = new Point(2, 1);
                 var fontSize = g.MeasureString(text, font); ;
-                var fontRoi = new Rectangle(bitmapRoi.X,
-                                            bitmapRoi.Y - (int)fontSize.Height - fontPadding.Y - 4, 
-                                            (int)fontSize.Width + 2 * fontPadding.X, 
-                                            (int)fontSize.Height + 2 * fontPadding.Y);
+                var fontRoi = new Rectangle(bitmapRoi.X - 1,
+                                            bitmapRoi.Y - (int)fontSize.Height - fontPadding.Y - fontFrameMargin - 1,
+                                            (int)fontSize.Width + 2 * fontPadding.X + 1,
+                                            (int)fontSize.Height + 2 * fontPadding.Y + 1);
 
-                fontRoi.X = Math.Max(fontMargin.X, fontRoi.X);
-                fontRoi.Y = Math.Max(fontMargin.Y, fontRoi.Y);
-                if (fontRoi.Right + fontMargin.X > size.Width)
-                    fontRoi.X = size.Width - fontMargin.X - fontRoi.Width;
-                if (fontRoi.Bottom + fontMargin.Y > size.Height)
-                    fontRoi.Y = size.Height - fontMargin.Y - fontRoi.Height;
+                fontRoi.X = Math.Max(fontBoundsMargin.X, fontRoi.X);
+                fontRoi.Y = Math.Max(fontBoundsMargin.Y, fontRoi.Y);
+                if (fontRoi.Right + fontBoundsMargin.X > size.Width)
+                    fontRoi.X = size.Width - fontBoundsMargin.X - fontRoi.Width;
+                if (fontRoi.Bottom + fontBoundsMargin.Y > size.Height)
+                    fontRoi.Y = size.Height - fontBoundsMargin.Y - fontRoi.Height;
 
-                using (var brush = new SolidBrush(Color.FromArgb(127, Color.White)))
-                    g.FillRectangle(brush, fontRoi);
-                using (var pen = new Pen(Color.Black))
-                {
-                    pen.Width = 1;
-                    pen.DashCap = DashCap.Flat;
-                    g.DrawRectangle(pen, fontRoi);
-                    
-                }
-                g.DrawString(text, font, Brushes.Black, fontRoi.X, fontRoi.Y);
+                using (var brush = new SolidBrush(Color.FromArgb(255, Color.Black)))
+                    g.FillPath(brush, RoundedRect(fontRoi, 3));
+                g.DrawString(text, font, Brushes.White, fontRoi.X + fontPadding.X - 1, fontRoi.Y + fontPadding.Y - 1);
             }
         }
 
@@ -332,6 +326,38 @@ namespace Darkshot.PaintTools
         {
             return point.X >= rect.X && point.X <= rect.X + rect.Width
                 && point.Y >= rect.Y && point.Y <= rect.Y + rect.Height;
+        }
+
+        GraphicsPath RoundedRect(Rectangle bounds, int radius)
+        {
+            var diameter = radius * 2;
+            var size = new Size(diameter, diameter);
+            var arc = new Rectangle(bounds.Location, size);
+            var path = new GraphicsPath();
+
+            if (radius == 0)
+            {
+                path.AddRectangle(bounds);
+                return path;
+            }
+
+            // top left arc  
+            path.AddArc(arc, 180, 90);
+
+            // top right arc  
+            arc.X = bounds.Right - diameter;
+            path.AddArc(arc, 270, 90);
+
+            // bottom right arc  
+            arc.Y = bounds.Bottom - diameter;
+            path.AddArc(arc, 0, 90);
+
+            // bottom left arc 
+            arc.X = bounds.Left;
+            path.AddArc(arc, 90, 90);
+
+            path.CloseFigure();
+            return path;
         }
     }
 }
