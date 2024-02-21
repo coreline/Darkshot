@@ -17,7 +17,9 @@ namespace Darkshot.PaintTools
         Rectangle,
         FilledRectangle,
         Text,
-        Marker
+        Marker,
+        AutoNumbering,
+        Blur
     }
 
     abstract class PaintTool
@@ -30,6 +32,11 @@ namespace Darkshot.PaintTools
         protected event MouseEventHandler MouseDown;
         protected event MouseEventHandler MouseMove;
         protected event MouseEventHandler MouseUp;
+
+        public static void Initialize()
+        {
+            PaintToolAutoNumbering.Reset();
+        }
 
         public static PaintTool Create(PaintToolType func, Color color)
         {
@@ -49,6 +56,10 @@ namespace Darkshot.PaintTools
                     return new PaintToolText(color);
                 case PaintToolType.Marker:
                     return new PaintToolMarker(color);
+                case PaintToolType.AutoNumbering:
+                    return new PaintToolAutoNumbering(color);
+                case PaintToolType.Blur:
+                    return new PaintToolBlur();
                 default:
                     throw new NotImplementedException();
             }
@@ -131,9 +142,11 @@ namespace Darkshot.PaintTools
             Invalidate(sender, bounds);
         }
 
-        public void RaiseComplete()
+        public void RaiseComplete(Control canvas)
         {
             Complete?.Invoke(this, EventArgs.Empty);
+            //Invalidate(canvas, GetBounds());
+            canvas.Invalidate();
         }
 
         protected void Invalidate(Control canvas, Rectangle roi)

@@ -68,7 +68,7 @@ namespace Darkshot.PaintTools
                 return;
 
             var bounds = GetBounds();
-            using (var bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format32bppArgb))
+            using (var bitmap = new Bitmap(bounds.Width, bounds.Height))
             {
                 using (var source = Graphics.FromImage(bitmap))
                 {
@@ -91,7 +91,7 @@ namespace Darkshot.PaintTools
                         source.DrawLines(_pen, points.ToArray());
                     }
                 }
-                g.PasteBitmap(bitmap, bounds.Left, bounds.Top, CopyPixelOperation.SourceAnd);
+                g.PasteBitmap(bitmap, bounds.Location, CopyPixelOperation.SourceAnd);
             }
         }
 
@@ -115,7 +115,7 @@ namespace Darkshot.PaintTools
             if (!_drawing)
                 return;
             _drawing = false;
-            RaiseComplete();
+            RaiseComplete(canvas);
         }
 
         void refreshPoints()

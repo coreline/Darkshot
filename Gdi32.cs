@@ -4,10 +4,12 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media.Media3D;
+using static Darkshot.Gdi32.Gdi32;
 
 namespace Darkshot.Gdi32
 {
@@ -70,6 +72,20 @@ namespace Darkshot.Gdi32
         [DllImport("gdi32", CharSet = CharSet.Auto, EntryPoint = "GetObject")]
         public static extern int GetObjectBitmap(IntPtr hObject, int nCount, ref BITMAP lpObject);
 
+        public static bool BitBlt(Graphics dest, int xDest, int yDest, int wDest, int hDest, Graphics src, int xSrc, int ySrc, CopyPixelOperation operation)
+        {
+            IntPtr srcDc = src.GetHdc();
+            IntPtr dstDc = dest.GetHdc();
+            var result = BitBlt(dstDc, xDest, yDest, wDest, hDest, srcDc, xSrc, ySrc, (int)operation);
+            src.ReleaseHdc(srcDc);
+            dest.ReleaseHdc(dstDc);
+            return result;
+        }
+        public static bool BitBlt(Graphics dest, Point pDest, Size size, Graphics src, Point pSrc, CopyPixelOperation operation)
+        {
+            return BitBlt(dest, pDest.X, pDest.Y, size.Width, size.Height, src, pSrc.X, pSrc.Y, operation);
+        }
+
         public static Bitmap CaptureControl(this Control control, Rectangle roi)
         {
 
@@ -121,17 +137,25 @@ namespace Darkshot.Gdi32
             return null;
         }
 
-        public static void PasteBitmap(this Graphics graphic, Bitmap bitmap, int left, int top, CopyPixelOperation copyPixelOperation)
+        public static void PasteBitmap(this Graphics graphic, Bitmap bitmap, Point dest, CopyPixelOperation operation)
         {
             IntPtr targetDC = graphic.GetHdc();
             IntPtr sourceDC = CreateCompatibleDC(targetDC);
             IntPtr sourceBitmap = bitmap.GetHbitmap();
             IntPtr originalBitmap = SelectObject(sourceDC, sourceBitmap);
-            BitBlt(targetDC, left, top, bitmap.Width, bitmap.Height, sourceDC, 0, 0, (int)copyPixelOperation);
+            BitBlt(targetDC, dest.X, dest.Y, bitmap.Width, bitmap.Height, sourceDC, 0, 0, (int)operation);
             SelectObject(sourceDC, originalBitmap);
             DeleteObject(sourceBitmap);
             DeleteDC(sourceDC);
             graphic.ReleaseHdc(targetDC);
+        }
+
+        public static Bitmap ToBitmap(this Graphics source, Rectangle roi)
+        {
+            var bitmap = new Bitmap(roi.Width, roi.Height);
+            using (var target = Graphics.FromImage(bitmap))
+                BitBlt(target, Point.Empty, bitmap.Size, source, roi.Location, CopyPixelOperation.SourceCopy);
+            return bitmap;
         }
     }
 }

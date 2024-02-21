@@ -70,7 +70,6 @@ namespace Darkshot.PaintTools
                 return;
             TextFormatFlags flags = TextFormatFlags.TextBoxControl | TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
             TextRenderer.DrawText(g, _text, _font, _rect, _color, flags);
-            //g.DrawString(_text, _font, Brushes.Red, _rect, StringFormat.GenericTypographic);
         }
 
         void onMouseDown(Control canvas, MouseEventArgs e)
@@ -92,7 +91,7 @@ namespace Darkshot.PaintTools
                 _movePoint = e.Location;
                 return;
             }
-            RaiseComplete();
+            RaiseComplete(canvas);
         }
 
         void onMouseMove(Control canvas, MouseEventArgs e)
@@ -145,7 +144,7 @@ namespace Darkshot.PaintTools
             }
             if (_initialized)
             {
-                RaiseComplete();
+                RaiseComplete(canvas);
                 return;
             }
         }

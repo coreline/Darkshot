@@ -17,7 +17,7 @@ namespace Darkshot.PaintTools
         {
             Paint += (s, e) => { onPaint(e.Graphics); };
             MouseDown += (s, e) => { onMouseDown(e); };
-            MouseUp += (s, e) => { onMouseUp(e); };
+            MouseUp += (s, e) => { onMouseUp(s as Control, e); };
             MouseMove += (s, e) => { onMouseMove(e); };
             KeyDown += (s, e) => setLastPoint();
             KeyUp += (s, e) => setLastPoint();
@@ -60,13 +60,13 @@ namespace Darkshot.PaintTools
             setEndPoint(e.Location);
         }
 
-        void onMouseUp(MouseEventArgs e)
+        void onMouseUp(Control canvas, MouseEventArgs e)
         {
             if (!_drawing)
                 return;
             _drawing = false;
             setEndPoint(e.Location);
-            RaiseComplete();
+            RaiseComplete(canvas);
         }
 
         void setLastPoint()

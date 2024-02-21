@@ -95,7 +95,7 @@ namespace Darkshot.PaintTools
             IsCreating = false;
             RoiMode = RoiModeType.None;
             canvas.Cursor = _cursor;
-            RaiseComplete();
+            RaiseComplete(canvas);
         }
 
         void onKeyDown(Control canvas, KeyEventArgs e)
@@ -178,7 +178,7 @@ namespace Darkshot.PaintTools
                 var fontFrameMargin = 4;
                 var fontBoundsMargin = new Point(100, 20);
                 var fontPadding = new Point(2, 1);
-                var fontSize = g.MeasureString(text, font); ;
+                var fontSize = g.MeasureString(text, font);
                 var fontRoi = new Rectangle(bitmapRoi.X - 1,
                                             bitmapRoi.Y - (int)fontSize.Height - fontPadding.Y - fontFrameMargin - 1,
                                             (int)fontSize.Width + 2 * fontPadding.X + 1,

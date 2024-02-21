@@ -38,6 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -86,10 +88,13 @@
     <Compile Include="Controls\CustomColorDialog.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Filters.cs" />
     <Compile Include="Gdi32.cs" />
     <Compile Include="GlobalKeyboardHook.cs" />
     <Compile Include="NativeVirtualScreen.cs" />
     <Compile Include="PaintTools\PaintTool.cs" />
+    <Compile Include="PaintTools\PaintToolAutoNumbering.cs" />
+    <Compile Include="PaintTools\PaintToolBlur.cs" />
     <Compile Include="PaintTools\PaintToolFilledRectangle.cs" />
     <Compile Include="PaintTools\PaintToolArrow.cs" />
     <Compile Include="PaintTools\PaintToolText.cs" />

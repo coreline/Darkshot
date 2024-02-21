@@ -45,6 +45,7 @@ namespace Darkshot
         {
             InitializeCaptureBitmap();
             InitializeComponent();
+
 #if DEBUG
             TopMost = false;
 #endif
@@ -53,6 +54,7 @@ namespace Darkshot
             ClientSize = NativeVirtualScreen.Bounds.Size;
             MaximumSize = NativeVirtualScreen.Bounds.Size;
             MinimumSize = NativeVirtualScreen.Bounds.Size;
+
             RefreshColorIcon();
             Invalidate();
 
@@ -89,7 +91,7 @@ namespace Darkshot
 
         public void CopyToClipboard()
         {
-            GetPaintTool()?.RaiseComplete();
+            GetPaintTool()?.RaiseComplete(this);
             if (_area.IsEmpty)
                 return;
             using (var image = BuildImage(ImageFormat.Png))
@@ -99,7 +101,7 @@ namespace Darkshot
 
         public void SaveAs()
         {
-            GetPaintTool()?.RaiseComplete();
+            GetPaintTool()?.RaiseComplete(this);
             if (_area.IsEmpty)
                 return;
             if (saveFileDialog.Tag?.ToString() == true.ToString())
@@ -246,17 +248,19 @@ namespace Darkshot
 
         private void OnPaint(object sender, PaintEventArgs e)
         {
+            PaintTool.Initialize();
             e.Graphics.Clear(Color.Black);
             e.Graphics.DrawImageUnscaled(_bitmap, Point.Empty);
             foreach (var item in _actionsTodo)
                 item.RaisePaint(this, e);
             _tool?.RaisePaint(this, e);
             _area.RaisePaint(this, e);
+            SetDefaultCursor();
         }
 
         private void OnToolPaintClick(object sender, EventArgs e)
         {
-            GetPaintTool()?.RaiseComplete();
+            GetPaintTool()?.RaiseComplete(this);
             if (string.IsNullOrEmpty(((ToolStripItem)sender).Tag?.ToString()))
                 return;
             foreach (var item in toolsPaint.Items)
@@ -324,7 +328,7 @@ namespace Darkshot
 
         private void RefreshToolsLocation()
         {
-            int margin = 7;
+            const int margin = 7;
 
             var paintLeft = _area.Roi.X + _area.Roi.Width + margin;
             paintLeft = Math.Max(paintLeft, margin);
