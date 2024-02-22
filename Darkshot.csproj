@@ -38,7 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -88,7 +88,6 @@
     <Compile Include="Controls\CustomColorDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Filters.cs" />
     <Compile Include="Gdi32.cs" />
     <Compile Include="GlobalKeyboardHook.cs" />
     <Compile Include="NativeVirtualScreen.cs" />
