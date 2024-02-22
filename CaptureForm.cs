@@ -26,8 +26,6 @@ namespace Darkshot
         PaintTool _tool;
         List<PaintTool> _actionsTodo = new List<PaintTool>();
         List<PaintTool> _actionsUndo = new List<PaintTool>();
-        //List<Bitmap> _bitmapTodo = new List<Bitmap>();
-        //List<Bitmap> _bitmapUndo = new List<Bitmap>();
 
         public Color CurrentColor
         {
@@ -174,7 +172,6 @@ namespace Darkshot
                     g.DrawImageUnscaled(_bitmap, Point.Empty);
                     foreach (var item in _actionsTodo)
                         item.RaisePaint(this, new PaintEventArgs(g, roi));
-                    //g.DrawImageUnscaled(_bitmapTodo.Count > 0 ? _bitmapTodo.Last() : _bitmap, Point.Empty);
                     _tool?.RaisePaint(this, new PaintEventArgs(g, roi));
                 }
 
@@ -206,13 +203,6 @@ namespace Darkshot
                 _actionsTodo.RemoveAt(i);
             }
             Invalidate();
-
-            //if (_bitmapTodo.Count == 0)
-            //    return;
-            //var i = _bitmapTodo.Count - 1;
-            //_bitmapUndo.Add(_bitmapTodo[i]);
-            //_bitmapTodo.RemoveAt(i);
-            //Invalidate();
         }
 
         public void Redo()
@@ -223,13 +213,6 @@ namespace Darkshot
             _actionsTodo.Add(_actionsUndo[i]);
             _actionsUndo.RemoveAt(i);
             Invalidate();
-
-            //if (_bitmapUndo.Count == 0)
-            //    return;
-            //var i = _bitmapUndo.Count - 1;
-            //_bitmapTodo.Add(_bitmapUndo[i]);
-            //_bitmapUndo.RemoveAt(i);
-            //Invalidate();
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
@@ -278,13 +261,6 @@ namespace Darkshot
             _tool?.RaisePaint(this, e);
             _area.RaisePaint(this, e);
             SetDefaultCursor();
-
-            //PaintTool.Initialize();
-            //e.Graphics.Clear(Color.Black);
-            //e.Graphics.DrawImageUnscaled(_bitmapTodo.Count > 0 ? _bitmapTodo.Last() : _bitmap, Point.Empty);
-            //_tool?.RaisePaint(this, e);
-            //_area.RaisePaint(this, e);
-            //SetDefaultCursor();
         }
 
         private void OnToolPaintClick(object sender, EventArgs e)
@@ -412,8 +388,6 @@ namespace Darkshot
                 {
                     _actionsTodo.Add(_tool);
                     _actionsUndo.Clear();
-                    //_bitmapTodo.Add((Bitmap)BuildImageRoi(ImageFormat.Png, new Rectangle(Point.Empty, _bitmap.Size)));
-                    //_bitmapUndo.Clear();
                     _tool = null;
                     SetDefaultCursor();
                 };
